@@ -3,7 +3,7 @@ import NavBar from "@/components/Layout/NavBar";
 import Button from "@/components/Utils/Button";
 import FormWrapper from "@/components/Utils/FromWrapper";
 
-import hero from "@/assets/videoCom.png";
+import hero from "@/assets/images/videoCom.png";
 import initNewCall from "@/services/call/initNewCall";
 
 export default function Home() {
@@ -21,7 +21,7 @@ export default function Home() {
               Video chat with your friends and family with ease.
             </p>
             <div className="flex justify-center gap-2">
-              <Button buttonTitle="New Call" />
+              <Button buttonClassNames="glow" buttonTitle="New Call" />
               <FormWrapper
                 callback={initNewCall}
                 formClassNames="flex justify-center gap-2"

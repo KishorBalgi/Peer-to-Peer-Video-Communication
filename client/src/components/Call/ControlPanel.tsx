@@ -1,0 +1,56 @@
+"use client";
+import React, { useState } from "react";
+import mic_on from "@/assets/icons/mic-on.svg";
+import mic_off from "@/assets/icons/mic-off.svg";
+import video_on from "@/assets/icons/video-on.svg";
+import video_off from "@/assets/icons/video-off.svg";
+import end_call from "@/assets/icons/end-call.svg";
+import screen_share from "@/assets/icons/screen-share.svg";
+import setting from "@/assets/icons/setting.svg";
+
+import Button from "@/components/Utils/Button";
+
+const ControlPanel = () => {
+  const [mic, setMic] = useState(false);
+  const [video, setVideo] = useState(false);
+  const [screen, setScreen] = useState(false);
+
+  const handelMic = () => {
+    setMic(!mic);
+  };
+
+  const handelVideo = () => {
+    setVideo(!video);
+  };
+
+  const handelScreen = () => {
+    setScreen(!screen);
+  };
+
+  return (
+    <div className="absolute bottom-2 left-1/2 -translate-x-1/2">
+      {/* TODO: Display time */}
+      <div className="flex gap-2">
+        <Button
+          buttonIcon={mic ? mic_on : mic_off}
+          buttonClassNames={`py-4 m-0 ${mic ? "" : "bg-red-500"}`}
+          onClick={handelMic}
+        />
+        <Button
+          buttonIcon={video ? video_on : video_off}
+          buttonClassNames={`py-4 m-0 ${video ? "" : "bg-red-500"}`}
+          onClick={handelVideo}
+        />
+        <Button
+          buttonIcon={screen_share}
+          buttonClassNames={`py-4 m-0 ${screen ? "bg-green-500" : ""}`}
+          onClick={handelScreen}
+        />
+        <Button buttonIcon={setting} buttonClassNames="py-4 m-0" />
+        <Button buttonIcon={end_call} buttonClassNames="py-4 m-0 bg-red-500" />
+      </div>
+    </div>
+  );
+};
+
+export default ControlPanel;

@@ -31,7 +31,11 @@ const FormWrapper = ({
     >
       {children}
       <div className={buttonWrapperClassNames}>
-        <Button buttonTitle={buttonText} disabled={isPending} />
+        <Button
+          buttonClassNames="glow"
+          buttonTitle={buttonText}
+          disabled={isPending}
+        />
       </div>
     </form>
   );
