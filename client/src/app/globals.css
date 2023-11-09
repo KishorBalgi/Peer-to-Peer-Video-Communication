@@ -7,3 +7,18 @@
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
 }
+
+body {
+  color: #fff;
+}
+
+/* Outer Glow */
+.glow {
+  box-shadow: 0 0 15px 5px rgb(158, 79, 222, 0.5);
+  transition: all;
+  transition-duration: 0.5s;
+}
+
+button.glow:hover {
+  box-shadow: 0 0 15px 5px rgba(255, 255, 255, 0.5);
+}
