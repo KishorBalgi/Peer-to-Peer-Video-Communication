@@ -6,6 +6,7 @@ import video_on from "@/assets/icons/video-on.svg";
 import video_off from "@/assets/icons/video-off.svg";
 import end_call from "@/assets/icons/end-call.svg";
 import screen_share from "@/assets/icons/screen-share.svg";
+import screen_share_off from "@/assets/icons/screen-share-off.svg";
 import setting from "@/assets/icons/setting.svg";
 
 import Button from "@/components/Utils/Button";
@@ -33,21 +34,25 @@ const ControlPanel = () => {
       <div className="flex gap-2">
         <Button
           buttonIcon={mic ? mic_on : mic_off}
-          buttonClassNames={`py-4 m-0 ${mic ? "" : "bg-red-500"}`}
+          buttonClassNames={`py-4 m-0 ${mic ? "!bg-green-500" : "!bg-red-500"}`}
           onClick={handelMic}
         />
         <Button
           buttonIcon={video ? video_on : video_off}
-          buttonClassNames={`py-4 m-0 ${video ? "" : "bg-red-500"}`}
+          buttonClassNames={`py-4 m-0 ${
+            video ? "!bg-green-500" : "!bg-red-500"
+          }`}
           onClick={handelVideo}
         />
         <Button
-          buttonIcon={screen_share}
-          buttonClassNames={`py-4 m-0 ${screen ? "bg-green-500" : ""}`}
+          buttonIcon={screen ? screen_share : screen_share_off}
+          buttonClassNames={`py-4 m-0 ${
+            screen ? "!bg-green-500" : "!bg-red-500"
+          }`}
           onClick={handelScreen}
         />
         <Button buttonIcon={setting} buttonClassNames="py-4 m-0" />
-        <Button buttonIcon={end_call} buttonClassNames="py-4 m-0 bg-red-500" />
+        <Button buttonIcon={end_call} buttonClassNames="py-4 m-0 !bg-red-500" />
       </div>
     </div>
   );
