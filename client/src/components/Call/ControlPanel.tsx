@@ -51,7 +51,7 @@ const ControlPanel = () => {
           }`}
           onClick={handelScreen}
         />
-        <Button buttonIcon={setting} buttonClassNames="py-4 m-0" />
+        <Button buttonIcon={setting} buttonClassNames="py-4 m-0 !bg-gray-100" />
         <Button buttonIcon={end_call} buttonClassNames="py-4 m-0 !bg-red-500" />
       </div>
     </div>

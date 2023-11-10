@@ -37,24 +37,24 @@ const SideControlPanel = () => {
   };
 
   return (
-    <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center">
+    <div className="flex items-center mr-3">
       {/* TODO: Display time */}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 w-max">
         <Button
           buttonIcon={chat}
-          buttonClassNames={`py-4 m-0 ${showChat ? "!bg-green-500" : ""}`}
+          buttonClassNames={`!p-2 m-0 ${showChat ? "" : "!bg-gray-100"}`}
           onClick={() => handlePanelDisplay("chat")}
         />
         <Button
           buttonIcon={participants}
-          buttonClassNames={`py-4 m-0 ${
-            showParticipants ? "!bg-green-500" : ""
+          buttonClassNames={`!p-2  m-0 ${
+            showParticipants ? "" : "!bg-gray-100"
           }`}
           onClick={() => handlePanelDisplay("participants")}
         />
         <Button
           buttonIcon={info}
-          buttonClassNames={`py-4 m-0 ${showInfo ? "!bg-green-500" : ""}`}
+          buttonClassNames={`!p-2 m-0 ${showInfo ? "" : "!bg-gray-100"}`}
           onClick={() => handlePanelDisplay("info")}
         />
       </div>
