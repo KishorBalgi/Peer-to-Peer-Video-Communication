@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
+import { SocketProvider } from "@/contexts/SocketContext";
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -16,7 +18,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} bg-primary`}>{children}</body>
+      <body className={`${inter.className} bg-primary`}>
+        <SocketProvider>{children}</SocketProvider>
+      </body>
     </html>
   );
 }

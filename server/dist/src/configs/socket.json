@@ -1,3 +1,5 @@
 {
-    "Event": "event"
+    "JOIN_CALL": "join_call",
+    "LEAVE_CALL": "leave_call",
+    "USER_JOINED": "user_joined"
 }

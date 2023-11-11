@@ -1,3 +1,4 @@
+"use client";
 import Image from "next/image";
 import NavBar from "@/components/Layout/NavBar";
 import Button from "@/components/Utils/Button";
@@ -5,8 +6,13 @@ import FormWrapper from "@/components/Utils/FromWrapper";
 
 import hero from "@/assets/images/videoCom.png";
 import initNewCall from "@/services/call/initNewCall";
+import { useSocket } from "@/contexts/SocketContext";
 
 export default function Home() {
+  const { socket } = useSocket();
+  console.log(socket);
+
+  socket?.on("HELLO", (data) => console.log(data));
   return (
     <main className="">
       <NavBar />
