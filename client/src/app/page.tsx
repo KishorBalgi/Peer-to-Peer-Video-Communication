@@ -1,18 +1,18 @@
 "use client";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import NavBar from "@/components/Layout/NavBar";
 import Button from "@/components/Utils/Button";
 import FormWrapper from "@/components/Utils/FromWrapper";
 
 import hero from "@/assets/images/videoCom.png";
-import initNewCall from "@/services/call/initNewCall";
 import { useSocket } from "@/contexts/SocketContext";
+import { initNewCall } from "@/services/socket/call.services";
 
 export default function Home() {
+  const router = useRouter();
   const { socket } = useSocket();
-  console.log(socket);
 
-  socket?.on("HELLO", (data) => console.log(data));
   return (
     <main className="">
       <NavBar />
@@ -27,9 +27,13 @@ export default function Home() {
               Video chat with your friends and family with ease.
             </p>
             <div className="flex justify-center gap-2">
-              <Button buttonClassNames="glow" buttonTitle="New Call" />
+              <Button
+                buttonClassNames="glow"
+                buttonTitle="New Call"
+                onClick={() => initNewCall(socket, router)}
+              />
               <FormWrapper
-                callback={initNewCall}
+                callback={() => initNewCall(socket, router)}
                 formClassNames="flex justify-center gap-2"
                 buttonText="Join Call"
               >

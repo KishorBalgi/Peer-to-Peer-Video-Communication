@@ -5,6 +5,11 @@ import cors from "cors";
 
 import { initiateSocket } from "./src/socket/socketConfig.js";
 import environment from "./src/configs/environment.json";
+
+import {
+  ServerToClientEvents,
+  ClientToServerEvents,
+} from "./src/types/socketInterfaces.js";
 // Express setup:
 const app = express();
 
@@ -32,7 +37,7 @@ app.get("/", (req, res, next) => {
 // Socket setup:
 export const httpServer = createServer(app);
 
-const io = new Server(httpServer, {
+const io = new Server<ServerToClientEvents, ClientToServerEvents>(httpServer, {
   cors: {
     origin: allowedOrigin,
     credentials: true,

@@ -1,24 +1,63 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 
 import mic_off from "@/assets/icons/mic-off.svg";
 import mic_on from "@/assets/icons/mic-on.svg";
 import video_off from "@/assets/icons/video-off.svg";
-const VideoContainer = () => {
-  const [mic, setMic] = useState(false);
-  const [video, setVideo] = useState(false);
+
+type VideoContainerProps = {
+  stream: MediaStream;
+};
+
+const VideoContainer = ({ stream }: VideoContainerProps) => {
+  // const [micEnabled, setMicEnabled] = useState(true);
+  // const [videoEnabled, setVideoEnabled] = useState(true);
+
+  // useEffect(() => {
+  //   const updateStreamStatus = () => {
+  //     console.log("updateStreamStatus");
+  //     if (!stream) return;
+  //     setMicEnabled(stream.getAudioTracks()[0].enabled);
+  //     setVideoEnabled(stream.getVideoTracks()[0].enabled);
+  //   };
+  //   updateStreamStatus();
+
+  //   // Listen for changes in the stream:
+  //   stream.getTracks().forEach((track) => {
+  //     track.onmute = updateStreamStatus;
+  //     track.onunmute = updateStreamStatus;
+  //     track.onended = updateStreamStatus;
+  //   });
+
+  //   return () => {
+  //     stream.getTracks().forEach((track) => {
+  //       track.onmute = null;
+  //       track.onunmute = null;
+  //       track.onended = null;
+  //     });
+  //   };
+  // }, [stream]);
+
   return (
     <div className="w-full h-full flex flex-col justify-center items-center border border-opacity-20 border-white rounded-lg relative p-4">
-      {!mic && (
+      {!true && (
         <Image
           src={mic_off}
           alt="mic"
           className="w-7 h-7 bg-white rounded-full p-1 absolute top-4 right-4"
         />
       )}
-      {video ? (
-        <video />
+      {true ? (
+        // Set the video element's srcObject to the stream which is MediaStream type:
+        <video
+          className="w-max bg-black rounded-lg"
+          autoPlay
+          ref={(video) => {
+            if (!video) return;
+            video.srcObject = stream;
+          }}
+        />
       ) : (
         <Image
           src={video_off}

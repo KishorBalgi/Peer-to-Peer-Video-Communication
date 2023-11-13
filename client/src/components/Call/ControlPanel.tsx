@@ -10,17 +10,24 @@ import screen_share_off from "@/assets/icons/screen-share-off.svg";
 import setting from "@/assets/icons/setting.svg";
 
 import Button from "@/components/Utils/Button";
+import { useLocalStream } from "@/contexts/LocalStreamContext";
 
 const ControlPanel = () => {
+  const { localStream, setLocalStream } = useLocalStream();
+
   const [mic, setMic] = useState(false);
   const [video, setVideo] = useState(false);
   const [screen, setScreen] = useState(false);
 
   const handelMic = () => {
+    if (!localStream) return;
+    localStream.getAudioTracks()[0].enabled = !mic;
     setMic(!mic);
   };
 
   const handelVideo = () => {
+    if (!localStream) return;
+    localStream.getVideoTracks()[0].enabled = !video;
     setVideo(!video);
   };
 
