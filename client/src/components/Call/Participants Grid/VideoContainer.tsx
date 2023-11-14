@@ -11,47 +11,43 @@ type VideoContainerProps = {
 };
 
 const VideoContainer = ({ stream }: VideoContainerProps) => {
-  // const [micEnabled, setMicEnabled] = useState(true);
-  // const [videoEnabled, setVideoEnabled] = useState(true);
+  const [micEnabled, setMicEnabled] = useState(false);
+  const [videoEnabled, setVideoEnabled] = useState(false);
 
-  // useEffect(() => {
-  //   const updateStreamStatus = () => {
-  //     console.log("updateStreamStatus");
-  //     if (!stream) return;
-  //     setMicEnabled(stream.getAudioTracks()[0].enabled);
-  //     setVideoEnabled(stream.getVideoTracks()[0].enabled);
-  //   };
-  //   updateStreamStatus();
+  useEffect(() => {
+    const updateStreamStatus = () => {
+      console.log("updateStreamStatus");
+      if (!stream) return;
+      setMicEnabled(stream.getAudioTracks()[0]?.enabled);
+      setVideoEnabled(stream.getVideoTracks()[0]?.enabled);
+    };
+    updateStreamStatus();
 
-  //   // Listen for changes in the stream:
-  //   stream.getTracks().forEach((track) => {
-  //     track.onmute = updateStreamStatus;
-  //     track.onunmute = updateStreamStatus;
-  //     track.onended = updateStreamStatus;
-  //   });
+    // Listen for changes in the stream:
+    stream.onaddtrack = (event) => {
+      console.log(event);
+      updateStreamStatus();
+    };
+    stream.onremovetrack = updateStreamStatus;
 
-  //   return () => {
-  //     stream.getTracks().forEach((track) => {
-  //       track.onmute = null;
-  //       track.onunmute = null;
-  //       track.onended = null;
-  //     });
-  //   };
-  // }, [stream]);
+    return () => {
+      stream.onaddtrack = null;
+      stream.onremovetrack = null;
+    };
+  }, [stream]);
 
   return (
     <div className="w-full h-full flex flex-col justify-center items-center border border-opacity-20 border-white rounded-lg relative p-4">
-      {!true && (
+      {!micEnabled && (
         <Image
           src={mic_off}
           alt="mic"
           className="w-7 h-7 bg-white rounded-full p-1 absolute top-4 right-4"
         />
       )}
-      {true ? (
-        // Set the video element's srcObject to the stream which is MediaStream type:
+      {!videoEnabled ? (
         <video
-          className="w-max bg-black rounded-lg"
+          className=" bg-black rounded-lg"
           autoPlay
           ref={(video) => {
             if (!video) return;

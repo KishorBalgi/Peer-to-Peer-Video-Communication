@@ -11,6 +11,7 @@ import setting from "@/assets/icons/setting.svg";
 
 import Button from "@/components/Utils/Button";
 import { useLocalStream } from "@/contexts/LocalStreamContext";
+import { toggleVideoAudio } from "@/services/webRTC/init";
 
 const ControlPanel = () => {
   const { localStream, setLocalStream } = useLocalStream();
@@ -21,13 +22,16 @@ const ControlPanel = () => {
 
   const handelMic = () => {
     if (!localStream) return;
-    localStream.getAudioTracks()[0].enabled = !mic;
+    console.log(localStream);
+    toggleVideoAudio(localStream, "audio");
+    console.log(localStream.getAudioTracks()[0]);
     setMic(!mic);
   };
 
   const handelVideo = () => {
     if (!localStream) return;
-    localStream.getVideoTracks()[0].enabled = !video;
+
+    toggleVideoAudio(localStream, "video");
     setVideo(!video);
   };
 

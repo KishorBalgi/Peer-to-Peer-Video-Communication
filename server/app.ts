@@ -21,8 +21,6 @@ const allowedOrigin =
     ? environment.client_prod
     : environment.client_dev;
 
-console.log("Allowed Origins:", allowedOrigin);
-
 app.use(
   cors({
     origin: allowedOrigin,

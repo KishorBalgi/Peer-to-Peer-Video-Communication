@@ -1,37 +1,25 @@
 "use client";
 import React, { useEffect } from "react";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import ControlPanel from "@/components/Call/ControlPanel";
 import SideControlPanel from "@/components/Call/SideControl/SideControlPanel";
 import VideoGrid from "@/components/Call/Participants Grid/VideoGrid";
-import { initLocalStream } from "@/services/webRTC/init";
 
-import socketEvents from "@/configs/socket.json";
-import { useSocket } from "@/contexts/SocketContext";
 import { useLocalStream } from "@/contexts/LocalStreamContext";
-import { ICallbackResponse } from "@/types/socket";
+import { joinExistingCall } from "@/services/socket/call.services";
+import { getSocket } from "@/services/socket/socket.service";
 
 const CallPage = ({ params }: { params: { id: string } }) => {
+  const router = useRouter();
   const { setLocalStream } = useLocalStream();
-  const { socket } = useSocket();
+
+  const socket = getSocket();
 
   useEffect(() => {
     if (!socket) return; // 🚩 !socket
-
-    socket.emit(
-      socketEvents.JOIN_CALL,
-      params.id,
-      (response: ICallbackResponse) => {
-        if (response.status === "error") {
-          console.log(response.message);
-          redirect("/");
-        }
-
-        // Init local stream:
-        initLocalStream(setLocalStream);
-      }
-    );
+    console.log("socket exists");
+    joinExistingCall(params.id, setLocalStream, router);
   }, []);
 
   return (

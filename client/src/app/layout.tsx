@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
-import { SocketProvider } from "@/contexts/SocketContext";
-import { StreamsProvider } from "@/contexts/StreamsContext";
+import { RemoteStreamsProvider } from "@/contexts/RemoteStreamsContext";
 import { LocalStreamsProvider } from "@/contexts/LocalStreamContext";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -21,11 +20,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} bg-primary`}>
-        <SocketProvider>
-          <LocalStreamsProvider>
-            <StreamsProvider>{children}</StreamsProvider>
-          </LocalStreamsProvider>
-        </SocketProvider>
+        <LocalStreamsProvider>
+          <RemoteStreamsProvider>{children}</RemoteStreamsProvider>
+        </LocalStreamsProvider>
       </body>
     </html>
   );

@@ -35,11 +35,9 @@ const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    console.log("Getting socket");
     setSocket(getSocket());
 
     return () => {
-      console.log("Disconnecting socket");
       socket?.disconnect();
     };
   }, []);

@@ -17,7 +17,6 @@ app.use(express_1.default.json());
 const allowedOrigin = process.env.NODE_ENV === "production"
     ? environment_json_1.default.client_prod
     : environment_json_1.default.client_dev;
-console.log("Allowed Origins:", allowedOrigin);
 app.use((0, cors_1.default)({
     origin: allowedOrigin,
     credentials: true,

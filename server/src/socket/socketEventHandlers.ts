@@ -2,9 +2,10 @@ import { Server, Socket } from "socket.io";
 import { v4 as uuidv4 } from "uuid";
 import socketEvents from "../configs/socket.json";
 import {
-  ICallbackResponse,
-  IJoinCall,
-  ICreateCall,
+  TCallbackResponse,
+  TJoinCall,
+  TCreateCall,
+  TSignallingMessage,
 } from "../types/socketInterfaces";
 
 const createCall = () => {
@@ -21,11 +22,12 @@ const createCall = () => {
 export const mountJoinCallEvent = (io: Server, socket: Socket) => {
   socket.on(
     socketEvents.JOIN_CALL,
-    (data: IJoinCall, callback: (res: ICallbackResponse) => void) => {
+    (data: TJoinCall, callback: (res: TCallbackResponse) => void) => {
       // Check if the call exists in db:
 
       socket.join(data.callId);
-      socket.to(data.callId).emit(socketEvents.USER_JOINED, data.userSocketId);
+      console.log(`User ${data.userSocketId} joined call ${data.callId}`);
+      socket.to(data.callId).emit(socketEvents.USER_JOINED, socket.id);
 
       callback(
         socketResponse({
@@ -42,7 +44,7 @@ export const mountJoinCallEvent = (io: Server, socket: Socket) => {
 export const mountStartNewCallEvent = (io: Server, socket: Socket) => {
   socket.on(
     socketEvents.START_NEW_CALL,
-    (data: ICreateCall, callback: (res: ICallbackResponse) => void) => {
+    (data: TCreateCall, callback: (res: TCallbackResponse) => void) => {
       // Creata a new call:
       const callDetails = {
         callId: createCall(),
@@ -60,7 +62,17 @@ export const mountStartNewCallEvent = (io: Server, socket: Socket) => {
   );
 };
 
-const socketResponse = ({ status, message, data }: ICallbackResponse) => {
+// Signalling message event:
+export const mountSignallingMessageEvent = (io: Server, socket: Socket) => {
+  socket.on(socketEvents.SEND_SIGNAL, (data: TSignallingMessage) => {
+    // console.log("Signalling message: ", data);
+    socket
+      .to(data.to)
+      .emit(socketEvents.RECEIVE_SIGNAL, { ...data, to: socket.id });
+  });
+};
+
+const socketResponse = ({ status, message, data }: TCallbackResponse) => {
   return {
     status,
     message,
