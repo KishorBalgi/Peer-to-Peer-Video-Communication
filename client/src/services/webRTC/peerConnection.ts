@@ -1,3 +1,5 @@
+import { store } from "@/redux/store";
+import { addRemoteStream } from "@/redux/features/call/call.slice";
 import webRTCConfig from "@/configs/webRTC.config.json";
 import { sendSignallingMessage } from "../socket/call.services";
 import { TSignallingMessage } from "@/types/socket";
@@ -16,6 +18,7 @@ const createRTCPeerConnection = (localStream: MediaStream, userId: string) => {
   });
 
   let remoteStream: MediaStream = new MediaStream();
+  store.dispatch(addRemoteStream({ id: userId, stream: remoteStream }));
 
   // Event listener for remote stream:
   peerConnection.ontrack = (event) => {

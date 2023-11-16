@@ -61,9 +61,7 @@ const VideoContainer = ({ stream }: VideoContainerProps) => {
           className="w-24 h-24 bg-gray-700 rounded-full p-2"
         />
       )}
-      <p className="absolute bottom-0 left-0 m-2 font-semibold">
-        Participant Name
-      </p>
+      <p className="absolute bottom-0 left-0 m-2 font-semibold">{stream.id}</p>
     </div>
   );
 };

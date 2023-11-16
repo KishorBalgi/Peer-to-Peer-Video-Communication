@@ -25,7 +25,6 @@ export const initNewCall = (navigate: ReturnType<typeof useRouter>) => {
 // Join an existing call:
 export const joinExistingCall = (
   callId: string,
-  setLocalStream: React.Dispatch<React.SetStateAction<MediaStream | null>>,
   navigate: ReturnType<typeof useRouter>
 ) => {
   if (!socket) return; //🚩 !socket
@@ -42,7 +41,7 @@ export const joinExistingCall = (
       }
 
       // Init local stream:
-      initLocalStream(setLocalStream);
+      initLocalStream();
     }
   );
 };

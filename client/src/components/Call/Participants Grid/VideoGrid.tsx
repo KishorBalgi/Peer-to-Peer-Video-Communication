@@ -1,13 +1,21 @@
 "use client";
 import React, { useRef, useEffect } from "react";
 import VideoContainer from "./VideoContainer";
-import { useLocalStream } from "@/contexts/LocalStreamContext";
-import { useRemoteStreams } from "@/contexts/RemoteStreamsContext";
+import { useSelector } from "react-redux";
+import { ICall, IStream } from "@/types/redux";
+
+interface IRootState {
+  call: ICall;
+}
 
 const VideoGrid = () => {
-  const { localStream } = useLocalStream();
-  const { remoteStreams } = useRemoteStreams();
   const gridRef = useRef(null);
+  const localStream = useSelector(
+    (state: IRootState) => state.call.localStream
+  );
+  const remoteStreams = useSelector(
+    (state: IRootState) => state.call.remoteStreams
+  );
 
   useEffect(() => {
     if (gridRef.current === null) return;
@@ -28,9 +36,9 @@ const VideoGrid = () => {
       ref={gridRef}
       className="video-grid w-full grid h-[100vh] grid-cols-3 gap-2 px-5 pb-24 pt-5"
     >
-      {localStream && <VideoContainer stream={localStream} />}
-      {remoteStreams?.map((peer: any, index: number) => {
-        return <VideoContainer key={index} stream={peer} />;
+      {localStream && <VideoContainer stream={localStream.stream} />}
+      {remoteStreams?.map((peer: IStream) => {
+        return <VideoContainer key={peer.id} stream={peer.stream} />;
       })}
     </div>
   );

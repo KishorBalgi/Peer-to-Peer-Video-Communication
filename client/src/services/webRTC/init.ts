@@ -1,15 +1,16 @@
+import { store } from "@/redux/store";
+import { addLocalStream } from "@/redux/features/call/call.slice";
 import {
   newUserJoinedCall,
   receiveSignallingMessage,
 } from "../socket/call.services";
+import { IStream } from "@/types/redux";
 
-export const initLocalStream = async (
-  setLocalStream: React.Dispatch<React.SetStateAction<MediaStream | null>>
-) => {
+export const initLocalStream = async () => {
   try {
     const localStream = new MediaStream();
 
-    setLocalStream(localStream);
+    store.dispatch(addLocalStream({ id: "me", stream: localStream }));
 
     // Event listener for new user joined the call:
     newUserJoinedCall(localStream);
@@ -23,7 +24,7 @@ export const initLocalStream = async (
 
 // Turn on/off video and audio:
 export const toggleVideoAudio = async (
-  stream: MediaStream,
+  streamData: IStream,
   toggle: "video" | "audio"
 ) => {
   // console.log("Stream: ", stream);
@@ -33,16 +34,16 @@ export const toggleVideoAudio = async (
   // For video:
   if (toggle === "video") {
     try {
-      const videoTrack = stream.getVideoTracks()[0];
+      const videoTrack = streamData.stream.getVideoTracks()[0];
       if (videoTrack) {
         videoTrack.enabled = !videoTrack.enabled;
         videoTrack.stop();
-        return stream.removeTrack(videoTrack);
+        return streamData.stream.removeTrack(videoTrack);
       }
       const newVideoTrack = await navigator.mediaDevices.getUserMedia({
         video: true,
       });
-      stream.addTrack(newVideoTrack.getVideoTracks()[0]);
+      streamData.stream.addTrack(newVideoTrack.getVideoTracks()[0]);
     } catch (err) {
       console.log(err); //🚩 video track error
     }
@@ -51,16 +52,16 @@ export const toggleVideoAudio = async (
   // For audio:
   if (toggle === "audio") {
     try {
-      const audioTrack = stream.getAudioTracks()[0];
+      const audioTrack = streamData.stream.getAudioTracks()[0];
       if (audioTrack) {
         audioTrack.enabled = !audioTrack.enabled;
         audioTrack.stop();
-        return stream.removeTrack(audioTrack);
+        return streamData.stream.removeTrack(audioTrack);
       }
       const newAudioTrack = await navigator.mediaDevices.getUserMedia({
         audio: true,
       });
-      stream.addTrack(newAudioTrack.getAudioTracks()[0]);
+      streamData.stream.addTrack(newAudioTrack.getAudioTracks()[0]);
     } catch (err) {
       console.log(err); //🚩 audio track error
     }

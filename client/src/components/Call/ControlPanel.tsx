@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import mic_on from "@/assets/icons/mic-on.svg";
 import mic_off from "@/assets/icons/mic-off.svg";
 import video_on from "@/assets/icons/video-on.svg";
@@ -10,11 +11,18 @@ import screen_share_off from "@/assets/icons/screen-share-off.svg";
 import setting from "@/assets/icons/setting.svg";
 
 import Button from "@/components/Utils/Button";
-import { useLocalStream } from "@/contexts/LocalStreamContext";
 import { toggleVideoAudio } from "@/services/webRTC/init";
 
+import { ICall, IStream } from "@/types/redux";
+
+interface IRootState {
+  call: ICall;
+}
+
 const ControlPanel = () => {
-  const { localStream, setLocalStream } = useLocalStream();
+  const localStream = useSelector(
+    (state: IRootState) => state.call.localStream
+  );
 
   const [mic, setMic] = useState(false);
   const [video, setVideo] = useState(false);
@@ -22,15 +30,12 @@ const ControlPanel = () => {
 
   const handelMic = () => {
     if (!localStream) return;
-    console.log(localStream);
     toggleVideoAudio(localStream, "audio");
-    console.log(localStream.getAudioTracks()[0]);
     setMic(!mic);
   };
 
   const handelVideo = () => {
     if (!localStream) return;
-
     toggleVideoAudio(localStream, "video");
     setVideo(!video);
   };
