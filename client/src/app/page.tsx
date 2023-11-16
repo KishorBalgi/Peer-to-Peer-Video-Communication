@@ -1,12 +1,20 @@
+"use client";
+import React, { useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import NavBar from "@/components/Layout/NavBar";
 import Button from "@/components/Utils/Button";
 import FormWrapper from "@/components/Utils/FromWrapper";
 
 import hero from "@/assets/images/videoCom.png";
-import initNewCall from "@/services/call/initNewCall";
+import { useSocket } from "@/contexts/SocketContext";
+import { initNewCall } from "@/services/socket/call.services";
 
 export default function Home() {
+  const [roomID, setRoomID] = useState("");
+  const router = useRouter();
+  const { socket } = useSocket();
+
   return (
     <main className="">
       <NavBar />
@@ -21,19 +29,29 @@ export default function Home() {
               Video chat with your friends and family with ease.
             </p>
             <div className="flex justify-center gap-2">
-              <Button buttonClassNames="glow" buttonTitle="New Call" />
+              <Button
+                buttonClassNames="glow"
+                buttonTitle="New Call"
+                onClick={() => initNewCall(router)}
+              />
               <FormWrapper
-                callback={initNewCall}
+                callback={() => {
+                  // validate roomID:
+                  if (roomID.length !== 10) return; // 🚩 Invalid roomID
+                  router.push(`/${roomID}`);
+                }}
                 formClassNames="flex justify-center gap-2"
                 buttonText="Join Call"
               >
                 <input
                   className="glow rounded-full px-4 my-2 text-black outline-none"
                   type="text"
-                  maxLength={9}
-                  minLength={9}
+                  maxLength={10}
+                  minLength={10}
                   placeholder="Enter Room ID"
                   required
+                  value={roomID}
+                  onChange={(e) => setRoomID(e.target.value)}
                 />
               </FormWrapper>
             </div>

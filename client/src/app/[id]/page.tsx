@@ -1,11 +1,34 @@
-import ControlPanel from "@/components/Call/ControlPanel";
+"use client";
+import React, { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
-export default async function CallPage({ params }: { params: { id: string } }) {
+import ControlPanel from "@/components/Call/ControlPanel";
+import SideControlPanel from "@/components/Call/SideControl/SideControlPanel";
+import VideoGrid from "@/components/Call/Participants Grid/VideoGrid";
+
+import { joinExistingCall } from "@/services/socket/call.services";
+import { getSocket } from "@/services/socket/socket.service";
+
+const CallPage = ({ params }: { params: { id: string } }) => {
+  const router = useRouter();
+
+  const socket = getSocket();
+
+  useEffect(() => {
+    if (!socket) return; // 🚩 !socket
+    console.log("socket exists");
+    joinExistingCall(params.id, router);
+  }, []);
+
   return (
     <div>
-      <h1>Call</h1>
-      <p>This is the call page.</p>
+      <div className="flex justify-between items-center w-[100vw]">
+        <VideoGrid />
+        <SideControlPanel />
+      </div>
       <ControlPanel />
     </div>
   );
-}
+};
+
+export default CallPage;

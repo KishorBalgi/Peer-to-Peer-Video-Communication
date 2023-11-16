@@ -1,25 +1,42 @@
 "use client";
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import mic_on from "@/assets/icons/mic-on.svg";
 import mic_off from "@/assets/icons/mic-off.svg";
 import video_on from "@/assets/icons/video-on.svg";
 import video_off from "@/assets/icons/video-off.svg";
 import end_call from "@/assets/icons/end-call.svg";
 import screen_share from "@/assets/icons/screen-share.svg";
+import screen_share_off from "@/assets/icons/screen-share-off.svg";
 import setting from "@/assets/icons/setting.svg";
 
 import Button from "@/components/Utils/Button";
+import { toggleVideoAudio } from "@/services/webRTC/init";
+
+import { ICall, IStream } from "@/types/redux";
+
+interface IRootState {
+  call: ICall;
+}
 
 const ControlPanel = () => {
+  const localStream = useSelector(
+    (state: IRootState) => state.call.localStream
+  );
+
   const [mic, setMic] = useState(false);
   const [video, setVideo] = useState(false);
   const [screen, setScreen] = useState(false);
 
   const handelMic = () => {
+    if (!localStream) return;
+    toggleVideoAudio(localStream, "audio");
     setMic(!mic);
   };
 
   const handelVideo = () => {
+    if (!localStream) return;
+    toggleVideoAudio(localStream, "video");
     setVideo(!video);
   };
 
@@ -33,21 +50,25 @@ const ControlPanel = () => {
       <div className="flex gap-2">
         <Button
           buttonIcon={mic ? mic_on : mic_off}
-          buttonClassNames={`py-4 m-0 ${mic ? "" : "bg-red-500"}`}
+          buttonClassNames={`py-4 m-0 ${mic ? "!bg-green-500" : "!bg-red-500"}`}
           onClick={handelMic}
         />
         <Button
           buttonIcon={video ? video_on : video_off}
-          buttonClassNames={`py-4 m-0 ${video ? "" : "bg-red-500"}`}
+          buttonClassNames={`py-4 m-0 ${
+            video ? "!bg-green-500" : "!bg-red-500"
+          }`}
           onClick={handelVideo}
         />
         <Button
-          buttonIcon={screen_share}
-          buttonClassNames={`py-4 m-0 ${screen ? "bg-green-500" : ""}`}
+          buttonIcon={screen ? screen_share : screen_share_off}
+          buttonClassNames={`py-4 m-0 ${
+            screen ? "!bg-green-500" : "!bg-red-500"
+          }`}
           onClick={handelScreen}
         />
-        <Button buttonIcon={setting} buttonClassNames="py-4 m-0" />
-        <Button buttonIcon={end_call} buttonClassNames="py-4 m-0 bg-red-500" />
+        <Button buttonIcon={setting} buttonClassNames="py-4 m-0 !bg-gray-100" />
+        <Button buttonIcon={end_call} buttonClassNames="py-4 m-0 !bg-red-500" />
       </div>
     </div>
   );

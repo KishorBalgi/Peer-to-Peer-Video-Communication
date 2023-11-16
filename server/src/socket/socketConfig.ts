@@ -1,11 +1,23 @@
 import { Request } from "express";
 import { Server, Socket } from "socket.io";
-import socketConfig from "../configs/socket.json";
+import {
+  mountJoinCallEvent,
+  mountStartNewCallEvent,
+  mountSignallingMessageEvent,
+} from "./socketEventHandlers";
 
 // Util used to initiate and mount socket events:
 const initiateSocket = (io: Server) => {
   io.on("connection", (socket: Socket) => {
     console.log(`a user connected : ${socket.id}`);
+    // socket.emit("HELLO", "Hello from server " + socket.id);
+    // Join a private room:
+    socket.join(socket.id);
+
+    mountJoinCallEvent(io, socket);
+    mountStartNewCallEvent(io, socket);
+    mountSignallingMessageEvent(io, socket);
+
     socket.on("disconnect", () => {
       console.log("user disconnected");
     });

@@ -1,12 +1,32 @@
 import express from "express";
 import { createServer } from "node:http";
 import { Server } from "socket.io";
-import { initiateSocket } from "./src/socket/socketConfig.js";
+import cors from "cors";
 
+import { initiateSocket } from "./src/socket/socketConfig.js";
+import environment from "./src/configs/environment.json";
+
+import {
+  ServerToClientEvents,
+  ClientToServerEvents,
+} from "./src/types/socketInterfaces.js";
 // Express setup:
 const app = express();
 
 app.use(express.json());
+
+// CORS setup:
+const allowedOrigin =
+  process.env.NODE_ENV === "production"
+    ? environment.client_prod
+    : environment.client_dev;
+
+app.use(
+  cors({
+    origin: allowedOrigin,
+    credentials: true,
+  })
+);
 
 app.get("/", (req, res, next) => {
   res.send("<h1>This is the server for peer to peer video communication</h1>");
@@ -14,7 +34,13 @@ app.get("/", (req, res, next) => {
 
 // Socket setup:
 export const httpServer = createServer(app);
-const io = new Server(httpServer);
+
+const io = new Server<ServerToClientEvents, ClientToServerEvents>(httpServer, {
+  cors: {
+    origin: allowedOrigin,
+    credentials: true,
+  },
+});
 
 // Set io to app instead of global:
 app.set("io", io);

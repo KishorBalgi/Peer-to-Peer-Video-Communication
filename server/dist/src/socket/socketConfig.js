@@ -1,10 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.emitSocketEvent = exports.initiateSocket = void 0;
+const socketEventHandlers_1 = require("./socketEventHandlers");
 // Util used to initiate and mount socket events:
 const initiateSocket = (io) => {
     io.on("connection", (socket) => {
         console.log(`a user connected : ${socket.id}`);
+        // socket.emit("HELLO", "Hello from server " + socket.id);
+        // Join a private room:
+        socket.join(socket.id);
+        (0, socketEventHandlers_1.mountJoinCallEvent)(io, socket);
+        (0, socketEventHandlers_1.mountStartNewCallEvent)(io, socket);
+        (0, socketEventHandlers_1.mountSignallingMessageEvent)(io, socket);
         socket.on("disconnect", () => {
             console.log("user disconnected");
         });
