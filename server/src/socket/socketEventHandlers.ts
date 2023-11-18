@@ -6,6 +6,7 @@ import {
   TJoinCall,
   TCreateCall,
   TSignallingMessage,
+  TChatMessage,
 } from "../types/socketInterfaces";
 
 const createCall = () => {
@@ -15,11 +16,12 @@ const createCall = () => {
   //   1. check if the call id already exists in the database:
   //   2. if it does, then generate a new call id:
 
-  return callId;
+  // return callId;
+  return "1234567890";
 };
 
 // Join a call event:
-export const mountJoinCallEvent = (io: Server, socket: Socket) => {
+export const mountJoinCallEvent = (socket: Socket) => {
   socket.on(
     socketEvents.JOIN_CALL,
     (data: TJoinCall, callback: (res: TCallbackResponse) => void) => {
@@ -27,7 +29,7 @@ export const mountJoinCallEvent = (io: Server, socket: Socket) => {
 
       socket.join(data.callId);
       console.log(`User ${data.userSocketId} joined call ${data.callId}`);
-      socket.to(data.callId).emit(socketEvents.USER_JOINED, socket.id);
+      socket.to(data.callId).emit(socketEvents.USER_JOINED, data.userSocketId);
 
       callback(
         socketResponse({
@@ -41,7 +43,7 @@ export const mountJoinCallEvent = (io: Server, socket: Socket) => {
 };
 
 // Start a new call event:
-export const mountStartNewCallEvent = (io: Server, socket: Socket) => {
+export const mountStartNewCallEvent = (socket: Socket) => {
   socket.on(
     socketEvents.START_NEW_CALL,
     (data: TCreateCall, callback: (res: TCallbackResponse) => void) => {
@@ -63,12 +65,35 @@ export const mountStartNewCallEvent = (io: Server, socket: Socket) => {
 };
 
 // Signalling message event:
-export const mountSignallingMessageEvent = (io: Server, socket: Socket) => {
-  socket.on(socketEvents.SEND_SIGNAL, (data: TSignallingMessage) => {
-    // console.log("Signalling message: ", data);
-    socket
-      .to(data.to)
-      .emit(socketEvents.RECEIVE_SIGNAL, { ...data, to: socket.id });
+export const mountSignallingMessageEvent = (socket: Socket) => {
+  socket.on(socketEvents.SIGNAL_MSG, (data: TSignallingMessage) => {
+    if (data.type !== "candidate")
+      console.log("Signalling message: ", {
+        type: data.type,
+        from: data.from,
+        room: data.room,
+        to: data.to,
+        id: socket.id,
+      });
+
+    socket.to(data.room).to(data.to).emit(socketEvents.SIGNAL_MSG, data);
+  });
+};
+
+// Send In Call messages:
+export const mountSendInCallMessageEvent = (io: Server, socket: Socket) => {
+  socket.on(socketEvents.CHAT_MSG, (data: TChatMessage) => {
+    // Send the message to all the users in the room including the sender:
+    io.to(data.room).emit(socketEvents.CHAT_MSG, data);
+  });
+};
+
+// Test Message:
+export const mountTestMessageEvent = (socket: Socket) => {
+  socket.on("test", (data: any) => {
+    console.log("Test message: ", data);
+
+    socket.to(data.to).emit("test", { ...data, from: socket.id });
   });
 };
 

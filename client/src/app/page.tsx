@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import NavBar from "@/components/Layout/NavBar";
@@ -7,13 +7,12 @@ import Button from "@/components/Utils/Button";
 import FormWrapper from "@/components/Utils/FromWrapper";
 
 import hero from "@/assets/images/videoCom.png";
-import { useSocket } from "@/contexts/SocketContext";
 import { initNewCall } from "@/services/socket/call.services";
+import { socket } from "@/services/socket/socket.services";
 
 export default function Home() {
   const [roomID, setRoomID] = useState("");
   const router = useRouter();
-  const { socket } = useSocket();
 
   return (
     <main className="">

@@ -6,7 +6,6 @@ import {
   removeRemoteStreamReducer,
 } from "./call.reducer";
 import { ICall } from "@/types/redux";
-import exp from "constants";
 
 // Initial state:
 const initialState: ICall = {

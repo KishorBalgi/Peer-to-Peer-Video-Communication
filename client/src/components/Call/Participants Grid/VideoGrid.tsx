@@ -2,11 +2,8 @@
 import React, { useRef, useEffect } from "react";
 import VideoContainer from "./VideoContainer";
 import { useSelector } from "react-redux";
-import { ICall, IStream } from "@/types/redux";
-
-interface IRootState {
-  call: ICall;
-}
+import { IRootState, IStream } from "@/types/redux";
+import { socket } from "@/services/socket/socket.services";
 
 const VideoGrid = () => {
   const gridRef = useRef(null);
@@ -36,9 +33,10 @@ const VideoGrid = () => {
       ref={gridRef}
       className="video-grid w-full grid h-[100vh] grid-cols-3 gap-2 px-5 pb-24 pt-5"
     >
-      {localStream && <VideoContainer stream={localStream.stream} />}
+      <p>ID: {socket.id}</p>
+      {localStream && <VideoContainer {...localStream} />}
       {remoteStreams?.map((peer: IStream) => {
-        return <VideoContainer key={peer.id} stream={peer.stream} />;
+        return <VideoContainer key={peer.peerId} {...peer} />;
       })}
     </div>
   );

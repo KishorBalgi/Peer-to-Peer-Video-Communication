@@ -5,19 +5,21 @@ import Image from "next/image";
 import mic_off from "@/assets/icons/mic-off.svg";
 import mic_on from "@/assets/icons/mic-on.svg";
 import video_off from "@/assets/icons/video-off.svg";
+import { getPeer } from "@/redux/features/call/peerStore";
 
 type VideoContainerProps = {
-  stream: MediaStream;
+  peerId: string;
 };
 
-const VideoContainer = ({ stream }: VideoContainerProps) => {
+const VideoContainer = ({ peerId }: VideoContainerProps) => {
   const [micEnabled, setMicEnabled] = useState(false);
   const [videoEnabled, setVideoEnabled] = useState(false);
+  const stream = getPeer(peerId)?.stream;
 
   useEffect(() => {
+    if (!stream) return;
+    // console.log(stream);
     const updateStreamStatus = () => {
-      console.log("updateStreamStatus");
-      if (!stream) return;
       setMicEnabled(stream.getAudioTracks()[0]?.enabled);
       setVideoEnabled(stream.getVideoTracks()[0]?.enabled);
     };
@@ -38,20 +40,20 @@ const VideoContainer = ({ stream }: VideoContainerProps) => {
 
   return (
     <div className="w-full h-full flex flex-col justify-center items-center border border-opacity-20 border-white rounded-lg relative p-4">
-      {!micEnabled && (
+      {true && (
         <Image
           src={mic_off}
           alt="mic"
           className="w-7 h-7 bg-white rounded-full p-1 absolute top-4 right-4"
         />
       )}
-      {!videoEnabled ? (
+      {true ? (
         <video
           className=" bg-black rounded-lg"
           autoPlay
           ref={(video) => {
             if (!video) return;
-            video.srcObject = stream;
+            video.srcObject = stream as MediaProvider;
           }}
         />
       ) : (
@@ -61,7 +63,7 @@ const VideoContainer = ({ stream }: VideoContainerProps) => {
           className="w-24 h-24 bg-gray-700 rounded-full p-2"
         />
       )}
-      <p className="absolute bottom-0 left-0 m-2 font-semibold">{stream.id}</p>
+      <p className="absolute bottom-0 left-0 m-2 font-semibold">{peerId}</p>
     </div>
   );
 };

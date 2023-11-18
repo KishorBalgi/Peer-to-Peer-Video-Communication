@@ -3,6 +3,6 @@
   "LEAVE_CALL": "leave_call",
   "USER_JOINED": "user_joined",
   "START_NEW_CALL": "start_new_call",
-  "SEND_SIGNAL": "send_signal",
-  "RECEIVE_SIGNAL": "receive_signal"
+  "SIGNAL_MSG": "signal_msg",
+  "CHAT_MSG": "chat_msg"
 }

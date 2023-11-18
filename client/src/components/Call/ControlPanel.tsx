@@ -12,12 +12,7 @@ import setting from "@/assets/icons/setting.svg";
 
 import Button from "@/components/Utils/Button";
 import { toggleVideoAudio } from "@/services/webRTC/init";
-
-import { ICall, IStream } from "@/types/redux";
-
-interface IRootState {
-  call: ICall;
-}
+import { IRootState } from "@/types/redux";
 
 const ControlPanel = () => {
   const localStream = useSelector(
