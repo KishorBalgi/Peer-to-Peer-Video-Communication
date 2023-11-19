@@ -4,6 +4,9 @@ import {
   mountJoinCallEvent,
   mountStartNewCallEvent,
   mountSignallingMessageEvent,
+  mountTestMessageEvent,
+  mountSendInCallMessageEvent,
+  mountLeaveCallEvent,
 } from "./socketEventHandlers";
 
 // Util used to initiate and mount socket events:
@@ -14,9 +17,12 @@ const initiateSocket = (io: Server) => {
     // Join a private room:
     socket.join(socket.id);
 
-    mountJoinCallEvent(io, socket);
-    mountStartNewCallEvent(io, socket);
-    mountSignallingMessageEvent(io, socket);
+    mountJoinCallEvent(socket);
+    mountStartNewCallEvent(socket);
+    mountSignallingMessageEvent(socket);
+    mountSendInCallMessageEvent(io, socket);
+    mountTestMessageEvent(socket);
+    mountLeaveCallEvent(socket);
 
     socket.on("disconnect", () => {
       console.log("user disconnected");

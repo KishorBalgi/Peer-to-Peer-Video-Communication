@@ -3,7 +3,6 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 
 import { ReduxProvider } from "@/redux/provider";
-import { store } from "@/redux/store";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,6 +16,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // if (socket) console.log("socket id: ", socket.id);
   return (
     <html lang="en">
       <body className={`${inter.className} bg-primary`}>

@@ -1,8 +1,16 @@
+import { useRouter } from "next/navigation";
 import { store } from "@/redux/store";
-import { addRemoteStream } from "@/redux/features/call/call.slice";
+import { socket } from "../socket/socket.services";
+import {
+  addRemoteStream,
+  removeLocalStream,
+  removeRemoteStream,
+} from "@/redux/features/call/call.slice";
 import webRTCConfig from "@/configs/webRTC.config.json";
-import { sendSignallingMessage } from "../socket/call.services";
+import { leaveCall, sendSignallingMessage } from "../socket/call.services";
 import { TSignallingMessage } from "@/types/socket";
+import { addPeer, getPeer, removePeer } from "@/redux/features/call/peerStore";
+import { removeCallListeners } from "../socket/socket.cleanup";
 
 // STUN servers:
 const configuration = {
@@ -10,18 +18,31 @@ const configuration = {
 };
 
 // Create RTC peer connection:
-let peerConnection: RTCPeerConnection = new RTCPeerConnection(configuration);
-const createRTCPeerConnection = (localStream: MediaStream, userId: string) => {
+const createRTCPeerConnection = async (userId: string) => {
+  let peerConnection: RTCPeerConnection = new RTCPeerConnection(configuration);
+
+  console.log("New Peer Connection:", peerConnection);
+  const localStream = getPeer(socket.id)?.stream;
+
+  if (!localStream) return console.log("Local stream not found");
+
   // Add local stream to peer connection:
   localStream.getTracks().forEach((track) => {
     peerConnection.addTrack(track, localStream);
   });
 
   let remoteStream: MediaStream = new MediaStream();
-  store.dispatch(addRemoteStream({ id: userId, stream: remoteStream }));
+
+  addPeer(userId, { stream: remoteStream, connection: peerConnection });
+  store.dispatch(
+    addRemoteStream({
+      peerId: userId,
+    })
+  );
 
   // Event listener for remote stream:
   peerConnection.ontrack = (event) => {
+    console.log("Remote stream received");
     event.streams[0].getTracks().forEach((track) => {
       remoteStream.addTrack(track);
     });
@@ -32,8 +53,10 @@ const createRTCPeerConnection = (localStream: MediaStream, userId: string) => {
     // 🚩 Send ICE candidate to peer:
     if (event.candidate) {
       sendSignallingMessage({
-        type: "candidate",
         to: userId,
+        from: socket.id,
+        room: socket.callId,
+        type: "candidate",
         data: event.candidate,
       });
     }
@@ -41,93 +64,137 @@ const createRTCPeerConnection = (localStream: MediaStream, userId: string) => {
 };
 
 // Create offer:
-export const createOffer = async (localStream: MediaStream, userId: string) => {
-  await createRTCPeerConnection(localStream, userId);
+export const createOffer = async (userId: string) => {
+  await createRTCPeerConnection(userId);
+
+  const peerConnection = getPeer(userId)?.connection;
+
+  if (!peerConnection)
+    return console.log("Create Offer: Peer connection not found");
 
   const offer = await peerConnection.createOffer();
   await peerConnection.setLocalDescription(offer);
 
   // 🚩 Send offer to peer:
-  console.log("Creating offer");
+  console.log("Offer sent to peer: ", userId);
   sendSignallingMessage({
-    type: "offer",
     to: userId,
+    from: socket.id,
+    room: socket.callId,
+    type: "offer",
     data: offer,
   });
 };
 
 // Create answer:
-export const createAnswer = async (
-  localStream: MediaStream,
-  userId: string,
-  offer: RTCSessionDescriptionInit
-) => {
-  console.log("Creating answer");
-  await createRTCPeerConnection(localStream, userId);
+const createAnswer = async (message: TSignallingMessage) => {
+  await createRTCPeerConnection(message.from);
 
-  await peerConnection
-    .setRemoteDescription(offer)
-    .then(() => {
-      console.log("Remote description set");
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+  const peerConnection = getPeer(message.from)?.connection;
+
+  if (!peerConnection)
+    return console.log("Create Offer: Peer connection not found");
+
+  await peerConnection.setRemoteDescription(
+    message.data as RTCSessionDescriptionInit
+  );
 
   const answer = await peerConnection.createAnswer();
   await peerConnection.setLocalDescription(answer);
 
   // 🚩 Send answer to peer:
+  console.log("Answer sent to peer: ", message.from);
   sendSignallingMessage({
+    to: message.from,
+    from: socket.id,
+    room: socket.callId,
     type: "answer",
-    to: userId,
     data: answer,
   });
 };
 
 // Add answer:
-export const addAnswer = async (answer: RTCSessionDescriptionInit) => {
-  console.log("Adding answer");
-  await peerConnection
-    .setRemoteDescription(answer)
-    .then(() => {
-      console.log("Remote description set");
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+const addAnswer = async (message: TSignallingMessage) => {
+  console.log("Adding answer from peer: ", message.from);
+
+  const peerConnection = getPeer(message.from)?.connection;
+
+  if (!peerConnection)
+    return console.log("Add answer: Peer connection not found");
+
+  if (!peerConnection.currentRemoteDescription) {
+    await peerConnection.setRemoteDescription(
+      message.data as RTCSessionDescriptionInit
+    );
+  }
 };
 
 // Handle ICE candidate event:
-export const handleICECandidateEvent = async (
-  candidate: RTCIceCandidateInit
-) => {
-  console.log("Handling ICE candidate event");
+const handleICECandidateEvent = (message: TSignallingMessage) => {
+  // console.log("Handling ICE candidate event");
+  const peerConnection = getPeer(message.from)?.connection;
+
+  if (!peerConnection) return console.log("ICE: Peer connection not found");
+
   try {
-    await peerConnection.addIceCandidate(candidate);
+    peerConnection.addIceCandidate(message.data as RTCIceCandidate);
   } catch (err) {
     console.log(err); //🚩 ICE candidate error
   }
 };
 
 // Handle signalling message:
-export const handleSignallingMessage = async (
-  message: TSignallingMessage,
-  localStream: MediaStream
-) => {
+export const handleSignallingMessage = (message: TSignallingMessage) => {
   switch (message.type) {
     case "offer":
-      await createAnswer(
-        localStream,
-        message.to,
-        message.data as RTCSessionDescriptionInit
-      );
+      createAnswer(message);
       break;
     case "answer":
-      await addAnswer(message.data as RTCSessionDescriptionInit);
+      addAnswer(message);
       break;
     case "candidate":
-      await handleICECandidateEvent(message.data as RTCIceCandidateInit);
+      handleICECandidateEvent(message);
       break;
   }
+};
+
+// Leave call:
+export const leaveCallHandler = (navigate: ReturnType<typeof useRouter>) => {
+  // Get all peer ids:
+  const peerIds = store
+    .getState()
+    .call.remoteStreams.map((stream) => stream.peerId);
+
+  // Close all peer connections and remove remote streams:
+  peerIds.forEach((peerId) => {
+    const peerConnection = getPeer(peerId)?.connection;
+    if (!peerConnection) return console.log("Leave call: Peer not found");
+    peerConnection.close();
+    removePeer(peerId);
+    store.dispatch(removeRemoteStream(peerId));
+  });
+
+  // Close local stream:
+  const localStream = getPeer(socket.id)?.stream;
+  if (!localStream) return console.log("Local stream not found");
+  localStream.getTracks().forEach((track) => track.stop());
+  removePeer(socket.id);
+  store.dispatch(removeLocalStream());
+  // Send user left socket event:
+  leaveCall();
+
+  // Socket cleanup:
+  removeCallListeners();
+
+  // Redirect to home page:
+  navigate.push("/");
+};
+
+// User left call:
+export const userLeftCallHandler = (peerId: string) => {
+  const peerConnection = getPeer(peerId)?.connection;
+  if (!peerConnection) return console.log("User left call: Peer not found");
+  peerConnection.close();
+  removePeer(peerId);
+  store.dispatch(removeRemoteStream(peerId));
 };

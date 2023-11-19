@@ -28,6 +28,6 @@ export const removeRemoteStreamReducer = (
   action: PayloadAction<string>
 ) => {
   state.remoteStreams = state.remoteStreams.filter(
-    (stream) => stream.id !== action.payload
+    (stream) => stream.peerId !== action.payload
   );
 };

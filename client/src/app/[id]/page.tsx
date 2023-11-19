@@ -7,16 +7,11 @@ import SideControlPanel from "@/components/Call/SideControl/SideControlPanel";
 import VideoGrid from "@/components/Call/Participants Grid/VideoGrid";
 
 import { joinExistingCall } from "@/services/socket/call.services";
-import { getSocket } from "@/services/socket/socket.service";
 
 const CallPage = ({ params }: { params: { id: string } }) => {
   const router = useRouter();
 
-  const socket = getSocket();
-
   useEffect(() => {
-    if (!socket) return; // 🚩 !socket
-    console.log("socket exists");
     joinExistingCall(params.id, router);
   }, []);
 

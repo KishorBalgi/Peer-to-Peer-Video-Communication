@@ -11,20 +11,39 @@ export type TJoinCall = {
   userSocketId: string;
 };
 
+// Leave Call:
+export type TLeaveCall = {
+  callId: string;
+  userSocketId: string;
+};
+
 // Create Call:
 export type TCreateCall = {
   userSocketId: string;
 };
 
+// Chat message:
+export type TChatMessage = {
+  from: string;
+  to: string;
+  room: string;
+  message: string;
+};
+
 // Signalling message:
 export type TSignallingMessage = {
   to: string;
+  from: string;
+  room: string;
   type: "offer" | "answer" | "candidate";
   data: RTCSessionDescriptionInit | RTCIceCandidateInit;
 };
 
 export interface ServerToClientEvents {
   user_joined: (id: string) => void;
+  signal_msg: (data: TSignallingMessage) => void;
+  chat_msg: (data: TChatMessage) => void;
+  user_left: (id: string) => void;
 }
 
 export interface ClientToServerEvents {
@@ -33,4 +52,7 @@ export interface ClientToServerEvents {
     callback: (res: TCallbackResponse) => void
   ) => void;
   join_call: (data: TJoinCall) => void;
+  signal_msg: (data: TSignallingMessage) => void;
+  chat_msg: (data: TChatMessage) => void;
+  leave_call: (data: TLeaveCall) => void;
 }

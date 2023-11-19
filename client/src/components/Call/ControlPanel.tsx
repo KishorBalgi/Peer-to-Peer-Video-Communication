@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import mic_on from "@/assets/icons/mic-on.svg";
 import mic_off from "@/assets/icons/mic-off.svg";
@@ -12,14 +13,12 @@ import setting from "@/assets/icons/setting.svg";
 
 import Button from "@/components/Utils/Button";
 import { toggleVideoAudio } from "@/services/webRTC/init";
-
-import { ICall, IStream } from "@/types/redux";
-
-interface IRootState {
-  call: ICall;
-}
+import { leaveCallHandler } from "@/services/webRTC/peerConnection";
+import { IRootState } from "@/types/redux";
 
 const ControlPanel = () => {
+  const router = useRouter();
+
   const localStream = useSelector(
     (state: IRootState) => state.call.localStream
   );
@@ -45,7 +44,7 @@ const ControlPanel = () => {
   };
 
   return (
-    <div className="absolute bottom-2 left-1/2 -translate-x-1/2">
+    <div className="fixed bottom-2 left-1/2 -translate-x-1/2">
       {/* TODO: Display time */}
       <div className="flex gap-2">
         <Button
@@ -68,7 +67,11 @@ const ControlPanel = () => {
           onClick={handelScreen}
         />
         <Button buttonIcon={setting} buttonClassNames="py-4 m-0 !bg-gray-100" />
-        <Button buttonIcon={end_call} buttonClassNames="py-4 m-0 !bg-red-500" />
+        <Button
+          buttonIcon={end_call}
+          buttonClassNames="py-4 m-0 !bg-red-500"
+          onClick={() => leaveCallHandler(router)}
+        />
       </div>
     </div>
   );

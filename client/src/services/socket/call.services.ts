@@ -1,14 +1,12 @@
-import socketEvents from "@/configs/socket.json";
 import { useRouter } from "next/navigation";
 
+import { socket } from "./socket.services";
+import socketEvents from "@/configs/socket.json";
 import { initLocalStream } from "@/services/webRTC/init";
 import { handleSignallingMessage } from "../webRTC/peerConnection";
+import { createOffer, userLeftCallHandler } from "../webRTC/peerConnection";
 import { TCallbackResponse } from "@/types/socket";
-import { createOffer } from "../webRTC/peerConnection";
 import { TSignallingMessage } from "@/types/socket";
-import { getSocket } from "./socket.service";
-
-const socket = getSocket();
 
 // Initiate a new call:
 export const initNewCall = (navigate: ReturnType<typeof useRouter>) => {
@@ -23,11 +21,14 @@ export const initNewCall = (navigate: ReturnType<typeof useRouter>) => {
 };
 
 // Join an existing call:
-export const joinExistingCall = (
+export const joinExistingCall = async (
   callId: string,
   navigate: ReturnType<typeof useRouter>
 ) => {
   if (!socket) return; //🚩 !socket
+
+  // Init local stream:
+  await initLocalStream();
 
   socket.emit(
     socketEvents.JOIN_CALL,
@@ -35,37 +36,47 @@ export const joinExistingCall = (
       callId,
       userSocketId: socket.id,
     },
-    (response: TCallbackResponse) => {
-      if (response.status === "error") {
+    (res: TCallbackResponse) => {
+      if (res.status === "error") {
         navigate.push("/");
       }
-
-      // Init local stream:
-      initLocalStream();
+      socket.callId = callId;
     }
   );
 };
 
 // New user joined the call:
-export const newUserJoinedCall = (localStrema: MediaStream) => {
-  if (!socket) return; //🚩 !socket
+export const newUserJoinedCall = () => {
   socket.on(socketEvents.USER_JOINED, (userSocketId: string) => {
     console.log("New user joined the call: ", userSocketId);
-    createOffer(localStrema, userSocketId);
+    // socket.emit("test", { to: userSocketId, msg: "Hello" });
+    createOffer(userSocketId);
+  });
+};
+
+// Leave call:
+export const leaveCall = () => {
+  socket.emit(socketEvents.LEAVE_CALL, {
+    callId: socket.callId,
+    userSocketId: socket.id,
+  });
+};
+
+// User left the call:
+export const userLeftCall = () => {
+  socket.on(socketEvents.USER_LEFT, (userSocketId: string) => {
+    console.log("User left the call: ", userSocketId);
+    userLeftCallHandler(userSocketId);
   });
 };
 
 // Send signalling message:
 export const sendSignallingMessage = (message: TSignallingMessage) => {
   if (!socket) return; //🚩 !socket
-  socket.emit(socketEvents.SEND_SIGNAL, message);
+  socket.emit(socketEvents.SIGNAL_MSG, message);
 };
 
 // Receive signalling message:
-export const receiveSignallingMessage = (localStream: MediaStream) => {
-  if (!socket) return; //🚩 !socket
-  socket.on(socketEvents.RECEIVE_SIGNAL, (message: TSignallingMessage) => {
-    console.log("Received signalling message: ", message);
-    handleSignallingMessage(message, localStream);
-  });
+export const receiveSignallingMessage = () => {
+  socket.on(socketEvents.SIGNAL_MSG, handleSignallingMessage);
 };
