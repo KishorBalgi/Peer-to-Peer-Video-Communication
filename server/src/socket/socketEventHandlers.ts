@@ -7,6 +7,7 @@ import {
   TCreateCall,
   TSignallingMessage,
   TChatMessage,
+  TLeaveCall,
 } from "../types/socketInterfaces";
 
 const createCall = () => {
@@ -18,28 +19,6 @@ const createCall = () => {
 
   // return callId;
   return "1234567890";
-};
-
-// Join a call event:
-export const mountJoinCallEvent = (socket: Socket) => {
-  socket.on(
-    socketEvents.JOIN_CALL,
-    (data: TJoinCall, callback: (res: TCallbackResponse) => void) => {
-      // Check if the call exists in db:
-
-      socket.join(data.callId);
-      console.log(`User ${data.userSocketId} joined call ${data.callId}`);
-      socket.to(data.callId).emit(socketEvents.USER_JOINED, data.userSocketId);
-
-      callback(
-        socketResponse({
-          status: "success",
-          message: "Joined call successfully",
-          data: null,
-        })
-      );
-    }
-  );
 };
 
 // Start a new call event:
@@ -64,19 +43,40 @@ export const mountStartNewCallEvent = (socket: Socket) => {
   );
 };
 
+// Join a call event:
+export const mountJoinCallEvent = (socket: Socket) => {
+  socket.on(
+    socketEvents.JOIN_CALL,
+    (data: TJoinCall, callback: (res: TCallbackResponse) => void) => {
+      // Check if the call exists in db:
+      socket.join(data.callId);
+      console.log(`User ${data.userSocketId} joined call ${data.callId}`);
+      socket.to(data.callId).emit(socketEvents.USER_JOINED, data.userSocketId);
+
+      callback(
+        socketResponse({
+          status: "success",
+          message: "Joined call successfully",
+          data: null,
+        })
+      );
+    }
+  );
+};
+
+// Leave a call event:
+export const mountLeaveCallEvent = (socket: Socket) => {
+  socket.on(socketEvents.LEAVE_CALL, (data: TLeaveCall) => {
+    socket.leave(data.callId);
+    console.log(`User ${data.userSocketId} left call ${data.callId}`);
+    socket.to(data.callId).emit(socketEvents.USER_LEFT, data.userSocketId);
+  });
+};
+
 // Signalling message event:
 export const mountSignallingMessageEvent = (socket: Socket) => {
   socket.on(socketEvents.SIGNAL_MSG, (data: TSignallingMessage) => {
-    if (data.type !== "candidate")
-      console.log("Signalling message: ", {
-        type: data.type,
-        from: data.from,
-        room: data.room,
-        to: data.to,
-        id: socket.id,
-      });
-
-    socket.to(data.room).to(data.to).emit(socketEvents.SIGNAL_MSG, data);
+    socket.to(data.to).emit(socketEvents.SIGNAL_MSG, data);
   });
 };
 

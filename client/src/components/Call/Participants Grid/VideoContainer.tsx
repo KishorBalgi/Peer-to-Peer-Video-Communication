@@ -6,6 +6,7 @@ import mic_off from "@/assets/icons/mic-off.svg";
 import mic_on from "@/assets/icons/mic-on.svg";
 import video_off from "@/assets/icons/video-off.svg";
 import { getPeer } from "@/redux/features/call/peerStore";
+import { socket } from "@/services/socket/socket.services";
 
 type VideoContainerProps = {
   peerId: string;
@@ -51,6 +52,7 @@ const VideoContainer = ({ peerId }: VideoContainerProps) => {
         <video
           className=" bg-black rounded-lg"
           autoPlay
+          muted={peerId === socket.id}
           ref={(video) => {
             if (!video) return;
             video.srcObject = stream as MediaProvider;

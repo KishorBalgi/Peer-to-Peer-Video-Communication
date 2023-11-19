@@ -1,7 +1,7 @@
 import io, { Socket } from "socket.io-client";
 interface ISocketInstance extends Socket {
   // add default roomId as "":
-  roomId?: string;
+  callId?: string;
 }
 export const socket: ISocketInstance = io(
   process.env.NEXT_PUBLIC_SOCKET_URL as string,

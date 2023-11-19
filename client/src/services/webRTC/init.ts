@@ -5,6 +5,7 @@ import { addLocalStream } from "@/redux/features/call/call.slice";
 import {
   newUserJoinedCall,
   receiveSignallingMessage,
+  userLeftCall,
 } from "../socket/call.services";
 import { IStream } from "@/types/redux";
 import { receiveInCallMessage } from "../socket/chat.services";
@@ -25,19 +26,19 @@ export const initLocalStream = async () => {
     addPeer(socket.id, { stream: localStream, connection: null });
     store.dispatch(addLocalStream({ peerId: socket.id }));
 
-    // Event listener for new user joined the call:
+    // New user joined the call:
     newUserJoinedCall();
 
-    // Event listener for receiving signalling message:
+    // User left the call:
+    userLeftCall();
+
+    // Receive signalling message:
     receiveSignallingMessage();
 
-    // Event listener for chat message:
+    // Receive chat message:
     receiveInCallMessage((data) => {
       store.dispatch(addMessage(data));
     });
-
-    // console.log("Signal", socket.listeners("signal_msg"));
-    // console.log("User Join", socket.listeners("user_joined"));
   } catch (err) {
     console.log(err); //🚩 local stream error
   }

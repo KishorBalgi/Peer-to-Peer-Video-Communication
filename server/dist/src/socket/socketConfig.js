@@ -14,6 +14,7 @@ const initiateSocket = (io) => {
         (0, socketEventHandlers_1.mountSignallingMessageEvent)(socket);
         (0, socketEventHandlers_1.mountSendInCallMessageEvent)(io, socket);
         (0, socketEventHandlers_1.mountTestMessageEvent)(socket);
+        (0, socketEventHandlers_1.mountLeaveCallEvent)(socket);
         socket.on("disconnect", () => {
             console.log("user disconnected");
         });

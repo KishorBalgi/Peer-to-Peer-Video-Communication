@@ -18,7 +18,7 @@ const VideoGrid = () => {
     if (gridRef.current === null) return;
 
     const gridElement = gridRef.current as HTMLDivElement;
-    const members = remoteStreams?.length || 0;
+    const members = remoteStreams?.length + 1 || 0;
 
     let numCols = 1;
     if (members > 4) numCols = 3;
@@ -33,7 +33,6 @@ const VideoGrid = () => {
       ref={gridRef}
       className="video-grid w-full grid h-[100vh] grid-cols-3 gap-2 px-5 pb-24 pt-5"
     >
-      <p>ID: {socket.id}</p>
       {localStream && <VideoContainer {...localStream} />}
       {remoteStreams?.map((peer: IStream) => {
         return <VideoContainer key={peer.peerId} {...peer} />;

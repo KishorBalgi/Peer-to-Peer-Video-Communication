@@ -4,7 +4,7 @@ import { socket } from "./socket.services";
 import socketEvents from "@/configs/socket.json";
 import { initLocalStream } from "@/services/webRTC/init";
 import { handleSignallingMessage } from "../webRTC/peerConnection";
-import { createOffer } from "../webRTC/peerConnection";
+import { createOffer, userLeftCallHandler } from "../webRTC/peerConnection";
 import { TCallbackResponse } from "@/types/socket";
 import { TSignallingMessage } from "@/types/socket";
 
@@ -36,17 +36,13 @@ export const joinExistingCall = async (
       callId,
       userSocketId: socket.id,
     },
-    (response: TCallbackResponse) => {
-      if (response.status === "error") {
+    (res: TCallbackResponse) => {
+      if (res.status === "error") {
         navigate.push("/");
       }
-      socket.roomId = callId;
+      socket.callId = callId;
     }
   );
-
-  // socket.on("test", (data) => {
-  //   console.log("test: ", data);
-  // });
 };
 
 // New user joined the call:
@@ -58,15 +54,29 @@ export const newUserJoinedCall = () => {
   });
 };
 
+// Leave call:
+export const leaveCall = () => {
+  socket.emit(socketEvents.LEAVE_CALL, {
+    callId: socket.callId,
+    userSocketId: socket.id,
+  });
+};
+
+// User left the call:
+export const userLeftCall = () => {
+  socket.on(socketEvents.USER_LEFT, (userSocketId: string) => {
+    console.log("User left the call: ", userSocketId);
+    userLeftCallHandler(userSocketId);
+  });
+};
+
 // Send signalling message:
 export const sendSignallingMessage = (message: TSignallingMessage) => {
   if (!socket) return; //🚩 !socket
-  // console.log("Sending signalling message: ", message);
   socket.emit(socketEvents.SIGNAL_MSG, message);
 };
 
 // Receive signalling message:
 export const receiveSignallingMessage = () => {
-  // console.log("Receiving signalling message", socket);
   socket.on(socketEvents.SIGNAL_MSG, handleSignallingMessage);
 };

@@ -11,6 +11,12 @@ export type TJoinCall = {
   userSocketId: string;
 };
 
+// Leave Call:
+export type TLeaveCall = {
+  callId: string;
+  userSocketId: string;
+};
+
 // Create Call:
 export type TCreateCall = {
   userSocketId: string;
@@ -37,6 +43,7 @@ export interface ServerToClientEvents {
   user_joined: (id: string) => void;
   signal_msg: (data: TSignallingMessage) => void;
   chat_msg: (data: TChatMessage) => void;
+  user_left: (id: string) => void;
 }
 
 export interface ClientToServerEvents {
@@ -47,4 +54,5 @@ export interface ClientToServerEvents {
   join_call: (data: TJoinCall) => void;
   signal_msg: (data: TSignallingMessage) => void;
   chat_msg: (data: TChatMessage) => void;
+  leave_call: (data: TLeaveCall) => void;
 }

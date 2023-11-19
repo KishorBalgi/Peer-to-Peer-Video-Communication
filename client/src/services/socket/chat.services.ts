@@ -8,7 +8,7 @@ export const sendInCallMessage = (message: string) => {
   const data: TChatMessage = {
     from: socket.id,
     to: "*",
-    room: socket.roomId || "*",
+    room: socket.callId || "*",
     message,
   };
   socket.emit(socketEvents.CHAT_MSG, data);

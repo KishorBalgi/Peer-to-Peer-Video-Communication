@@ -6,6 +6,7 @@ import {
   mountSignallingMessageEvent,
   mountTestMessageEvent,
   mountSendInCallMessageEvent,
+  mountLeaveCallEvent,
 } from "./socketEventHandlers";
 
 // Util used to initiate and mount socket events:
@@ -21,6 +22,7 @@ const initiateSocket = (io: Server) => {
     mountSignallingMessageEvent(socket);
     mountSendInCallMessageEvent(io, socket);
     mountTestMessageEvent(socket);
+    mountLeaveCallEvent(socket);
 
     socket.on("disconnect", () => {
       console.log("user disconnected");

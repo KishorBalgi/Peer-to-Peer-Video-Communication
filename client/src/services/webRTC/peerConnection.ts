@@ -1,10 +1,16 @@
+import { useRouter } from "next/navigation";
 import { store } from "@/redux/store";
 import { socket } from "../socket/socket.services";
-import { addRemoteStream } from "@/redux/features/call/call.slice";
+import {
+  addRemoteStream,
+  removeLocalStream,
+  removeRemoteStream,
+} from "@/redux/features/call/call.slice";
 import webRTCConfig from "@/configs/webRTC.config.json";
-import { sendSignallingMessage } from "../socket/call.services";
+import { leaveCall, sendSignallingMessage } from "../socket/call.services";
 import { TSignallingMessage } from "@/types/socket";
-import { addPeer, getPeer } from "@/redux/features/call/peerStore";
+import { addPeer, getPeer, removePeer } from "@/redux/features/call/peerStore";
+import { removeCallListeners } from "../socket/socket.cleanup";
 
 // STUN servers:
 const configuration = {
@@ -14,6 +20,7 @@ const configuration = {
 // Create RTC peer connection:
 const createRTCPeerConnection = async (userId: string) => {
   let peerConnection: RTCPeerConnection = new RTCPeerConnection(configuration);
+
   console.log("New Peer Connection:", peerConnection);
   const localStream = getPeer(socket.id)?.stream;
 
@@ -48,7 +55,7 @@ const createRTCPeerConnection = async (userId: string) => {
       sendSignallingMessage({
         to: userId,
         from: socket.id,
-        room: socket.roomId,
+        room: socket.callId,
         type: "candidate",
         data: event.candidate,
       });
@@ -73,14 +80,14 @@ export const createOffer = async (userId: string) => {
   sendSignallingMessage({
     to: userId,
     from: socket.id,
-    room: socket.roomId,
+    room: socket.callId,
     type: "offer",
     data: offer,
   });
 };
 
 // Create answer:
-export const createAnswer = async (message: TSignallingMessage) => {
+const createAnswer = async (message: TSignallingMessage) => {
   await createRTCPeerConnection(message.from);
 
   const peerConnection = getPeer(message.from)?.connection;
@@ -100,14 +107,14 @@ export const createAnswer = async (message: TSignallingMessage) => {
   sendSignallingMessage({
     to: message.from,
     from: socket.id,
-    room: socket.roomId,
+    room: socket.callId,
     type: "answer",
     data: answer,
   });
 };
 
 // Add answer:
-export const addAnswer = async (message: TSignallingMessage) => {
+const addAnswer = async (message: TSignallingMessage) => {
   console.log("Adding answer from peer: ", message.from);
 
   const peerConnection = getPeer(message.from)?.connection;
@@ -123,7 +130,7 @@ export const addAnswer = async (message: TSignallingMessage) => {
 };
 
 // Handle ICE candidate event:
-export const handleICECandidateEvent = (message: TSignallingMessage) => {
+const handleICECandidateEvent = (message: TSignallingMessage) => {
   // console.log("Handling ICE candidate event");
   const peerConnection = getPeer(message.from)?.connection;
 
@@ -149,4 +156,45 @@ export const handleSignallingMessage = (message: TSignallingMessage) => {
       handleICECandidateEvent(message);
       break;
   }
+};
+
+// Leave call:
+export const leaveCallHandler = (navigate: ReturnType<typeof useRouter>) => {
+  // Get all peer ids:
+  const peerIds = store
+    .getState()
+    .call.remoteStreams.map((stream) => stream.peerId);
+
+  // Close all peer connections and remove remote streams:
+  peerIds.forEach((peerId) => {
+    const peerConnection = getPeer(peerId)?.connection;
+    if (!peerConnection) return console.log("Leave call: Peer not found");
+    peerConnection.close();
+    removePeer(peerId);
+    store.dispatch(removeRemoteStream(peerId));
+  });
+
+  // Close local stream:
+  const localStream = getPeer(socket.id)?.stream;
+  if (!localStream) return console.log("Local stream not found");
+  localStream.getTracks().forEach((track) => track.stop());
+  removePeer(socket.id);
+  store.dispatch(removeLocalStream());
+  // Send user left socket event:
+  leaveCall();
+
+  // Socket cleanup:
+  removeCallListeners();
+
+  // Redirect to home page:
+  navigate.push("/");
+};
+
+// User left call:
+export const userLeftCallHandler = (peerId: string) => {
+  const peerConnection = getPeer(peerId)?.connection;
+  if (!peerConnection) return console.log("User left call: Peer not found");
+  peerConnection.close();
+  removePeer(peerId);
+  store.dispatch(removeRemoteStream(peerId));
 };
