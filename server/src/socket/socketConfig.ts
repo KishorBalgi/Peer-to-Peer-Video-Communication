@@ -7,7 +7,7 @@ import {
   mountTestMessageEvent,
   mountSendInCallMessageEvent,
   mountLeaveCallEvent,
-} from "./socketEventHandlers.js";
+} from "./socketEventHandlers";
 
 // Util used to initiate and mount socket events:
 const initiateSocket = (io: Server) => {

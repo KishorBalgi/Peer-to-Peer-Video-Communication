@@ -3,13 +3,13 @@ import { createServer } from "node:http";
 import { Server } from "socket.io";
 import cors from "cors";
 
-import { initiateSocket } from "./socket/socketConfig.js";
-import environment from "./configs/environment.json" assert { type: "json" };
+import { initiateSocket } from "./socket/socketConfig";
+import environment from "./configs/environment.json";
 
 import {
   ServerToClientEvents,
   ClientToServerEvents,
-} from "./types/socketInterfaces.js";
+} from "./types/socketInterfaces";
 
 // Express setup:
 const app = express();
