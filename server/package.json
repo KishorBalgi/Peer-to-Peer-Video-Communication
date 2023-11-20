@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "npm run build && node dist/index.js",
     "dev": "npx nodemon",
-    "build": "rimraf ./dist && tsc"
+    "build": "rimraf ./dist && npx tsc"
   },
   "keywords": [],
   "author": "",

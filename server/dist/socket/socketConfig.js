@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.emitSocketEvent = exports.initiateSocket = void 0;
-const socketEventHandlers_1 = require("./socketEventHandlers");
+import { mountJoinCallEvent, mountStartNewCallEvent, mountSignallingMessageEvent, mountTestMessageEvent, mountSendInCallMessageEvent, mountLeaveCallEvent, } from "./socketEventHandlers";
 // Util used to initiate and mount socket events:
 const initiateSocket = (io) => {
     io.on("connection", (socket) => {
@@ -9,21 +6,20 @@ const initiateSocket = (io) => {
         // Join a private room:
         socket.join(socket.id);
         // Mount socket events:
-        (0, socketEventHandlers_1.mountJoinCallEvent)(socket);
-        (0, socketEventHandlers_1.mountStartNewCallEvent)(socket);
-        (0, socketEventHandlers_1.mountSignallingMessageEvent)(socket);
-        (0, socketEventHandlers_1.mountSendInCallMessageEvent)(io, socket);
-        (0, socketEventHandlers_1.mountTestMessageEvent)(socket);
-        (0, socketEventHandlers_1.mountLeaveCallEvent)(socket);
+        mountJoinCallEvent(socket);
+        mountStartNewCallEvent(socket);
+        mountSignallingMessageEvent(socket);
+        mountSendInCallMessageEvent(io, socket);
+        mountTestMessageEvent(socket);
+        mountLeaveCallEvent(socket);
         // Handle socket disconnection:
         socket.on("disconnect", () => {
             console.log("user disconnected");
         });
     });
 };
-exports.initiateSocket = initiateSocket;
 // Util used to send socket events:
 const emitSocketEvent = (req, roomId, event, data) => {
     req.app.get("io").to(roomId).emit(event, data);
 };
-exports.emitSocketEvent = emitSocketEvent;
+export { initiateSocket, emitSocketEvent };
