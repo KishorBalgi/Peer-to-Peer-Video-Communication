@@ -9,7 +9,7 @@ import environment from "./configs/environment.json";
 import {
   ServerToClientEvents,
   ClientToServerEvents,
-} from "./types/socketInterfaces.js";
+} from "./types/socketInterfaces";
 
 // Express setup:
 const app = express();

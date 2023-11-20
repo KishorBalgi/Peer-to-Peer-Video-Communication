@@ -3,9 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "type": "module",
   "scripts": {
-    "start": "npm run build && node dist/index.js",
+    "start": "node dist/index.js",
     "dev": "npx nodemon",
     "build": "rimraf ./dist && npx tsc"
   },
@@ -17,6 +16,7 @@
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "socket.io": "^4.7.2",
+    "ts-node": "^10.9.1",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
