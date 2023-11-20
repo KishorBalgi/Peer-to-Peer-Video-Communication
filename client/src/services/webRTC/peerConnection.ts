@@ -11,6 +11,11 @@ import { leaveCall, sendSignallingMessage } from "../socket/call.services";
 import { TSignallingMessage } from "@/types/socket";
 import { addPeer, getPeer, removePeer } from "@/redux/features/call/peerStore";
 import { removeCallListeners } from "../socket/socket.cleanup";
+import {
+  toastLoading,
+  toastMessage,
+  toastUpdate,
+} from "@/components/Notifications/toasts";
 
 // STUN servers:
 const configuration = {
@@ -127,6 +132,8 @@ const addAnswer = async (message: TSignallingMessage) => {
       message.data as RTCSessionDescriptionInit
     );
   }
+
+  toastMessage({ type: "info", message: `${message.from} joined` });
 };
 
 // Handle ICE candidate event:
@@ -160,6 +167,8 @@ export const handleSignallingMessage = (message: TSignallingMessage) => {
 
 // Leave call:
 export const leaveCallHandler = (navigate: ReturnType<typeof useRouter>) => {
+  const loadingToastId = toastLoading("Leaving call...");
+
   // Get all peer ids:
   const peerIds = store
     .getState()
@@ -188,6 +197,8 @@ export const leaveCallHandler = (navigate: ReturnType<typeof useRouter>) => {
 
   // Redirect to home page:
   navigate.push("/");
+
+  toastUpdate(loadingToastId, "success", "You left", false);
 };
 
 // User left call:

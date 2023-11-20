@@ -6,15 +6,16 @@ const socketEventHandlers_1 = require("./socketEventHandlers");
 const initiateSocket = (io) => {
     io.on("connection", (socket) => {
         console.log(`a user connected : ${socket.id}`);
-        // socket.emit("HELLO", "Hello from server " + socket.id);
         // Join a private room:
         socket.join(socket.id);
+        // Mount socket events:
         (0, socketEventHandlers_1.mountJoinCallEvent)(socket);
         (0, socketEventHandlers_1.mountStartNewCallEvent)(socket);
         (0, socketEventHandlers_1.mountSignallingMessageEvent)(socket);
         (0, socketEventHandlers_1.mountSendInCallMessageEvent)(io, socket);
         (0, socketEventHandlers_1.mountTestMessageEvent)(socket);
         (0, socketEventHandlers_1.mountLeaveCallEvent)(socket);
+        // Handle socket disconnection:
         socket.on("disconnect", () => {
             console.log("user disconnected");
         });

@@ -1,3 +1,4 @@
+import { toastMessage } from "@/components/Notifications/toasts";
 import { socket } from "./socket.services";
 import socketEvents from "@/configs/socket.json";
 import { TChatMessage } from "@/types/socket";
@@ -22,5 +23,8 @@ export const receiveInCallMessage = (
   socket.on(socketEvents.CHAT_MSG, (data: TChatMessage) => {
     console.log("In call message: ", data);
     callback(data);
+    // if(data.from !== socket.id){
+    //   toastMessage({type: "info", message: data.message});
+    // }
   });
 };

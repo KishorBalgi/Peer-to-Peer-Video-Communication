@@ -6,9 +6,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.mountTestMessageEvent = exports.mountSendInCallMessageEvent = exports.mountSignallingMessageEvent = exports.mountLeaveCallEvent = exports.mountJoinCallEvent = exports.mountStartNewCallEvent = void 0;
 const uuid_1 = require("uuid");
 const socket_json_1 = __importDefault(require("../configs/socket.json"));
+// Generate a unique call id with uuidv4() of length 10:
 const createCall = () => {
-    // generae a unique call id with uuidv4() of length 10:
     const callId = (0, uuid_1.v4)().replace(/-/g, "").slice(0, 10);
+    // 🚩
     //   1. check if the call id already exists in the database:
     //   2. if it does, then generate a new call id:
     // return callId;
@@ -33,7 +34,8 @@ exports.mountStartNewCallEvent = mountStartNewCallEvent;
 // Join a call event:
 const mountJoinCallEvent = (socket) => {
     socket.on(socket_json_1.default.JOIN_CALL, (data, callback) => {
-        // Check if the call exists in db:
+        // 🚩 Check if the call exists in db:
+        // If the call exists, then join the call:
         socket.join(data.callId);
         console.log(`User ${data.userSocketId} joined call ${data.callId}`);
         socket.to(data.callId).emit(socket_json_1.default.USER_JOINED, data.userSocketId);
@@ -69,7 +71,7 @@ const mountSendInCallMessageEvent = (io, socket) => {
     });
 };
 exports.mountSendInCallMessageEvent = mountSendInCallMessageEvent;
-// Test Message:
+// Test Message:🚩
 const mountTestMessageEvent = (socket) => {
     socket.on("test", (data) => {
         console.log("Test message: ", data);

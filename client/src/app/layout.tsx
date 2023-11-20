@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
+import { ToastContainer } from "react-toastify";
 import { ReduxProvider } from "@/redux/provider";
+
+import "react-toastify/dist/ReactToastify.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,11 +19,24 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // if (socket) console.log("socket id: ", socket.id);
   return (
     <html lang="en">
       <body className={`${inter.className} bg-primary`}>
         <ReduxProvider>{children}</ReduxProvider>
+
+        <ToastContainer
+          position="bottom-left"
+          autoClose={1000}
+          limit={3}
+          hideProgressBar
+          newestOnTop
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss={false}
+          draggable
+          pauseOnHover
+          theme="dark"
+        />
       </body>
     </html>
   );
