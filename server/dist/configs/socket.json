@@ -1,9 +1,0 @@
-{
-    "JOIN_CALL": "join_call",
-    "LEAVE_CALL": "leave_call",
-    "USER_JOINED": "user_joined",
-    "USER_LEFT": "user_left",
-    "START_NEW_CALL": "start_new_call",
-    "SIGNAL_MSG": "signal_msg",
-    "CHAT_MSG": "chat_msg"
-}
