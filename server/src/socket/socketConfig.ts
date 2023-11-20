@@ -13,10 +13,10 @@ import {
 const initiateSocket = (io: Server) => {
   io.on("connection", (socket: Socket) => {
     console.log(`a user connected : ${socket.id}`);
-    // socket.emit("HELLO", "Hello from server " + socket.id);
     // Join a private room:
     socket.join(socket.id);
 
+    // Mount socket events:
     mountJoinCallEvent(socket);
     mountStartNewCallEvent(socket);
     mountSignallingMessageEvent(socket);
@@ -24,6 +24,7 @@ const initiateSocket = (io: Server) => {
     mountTestMessageEvent(socket);
     mountLeaveCallEvent(socket);
 
+    // Handle socket disconnection:
     socket.on("disconnect", () => {
       console.log("user disconnected");
     });

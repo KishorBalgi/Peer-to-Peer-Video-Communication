@@ -10,10 +10,11 @@ import {
   TLeaveCall,
 } from "../types/socketInterfaces";
 
+// Generate a unique call id with uuidv4() of length 10:
 const createCall = () => {
-  // generae a unique call id with uuidv4() of length 10:
   const callId = uuidv4().replace(/-/g, "").slice(0, 10);
 
+  // 🚩
   //   1. check if the call id already exists in the database:
   //   2. if it does, then generate a new call id:
 
@@ -48,7 +49,9 @@ export const mountJoinCallEvent = (socket: Socket) => {
   socket.on(
     socketEvents.JOIN_CALL,
     (data: TJoinCall, callback: (res: TCallbackResponse) => void) => {
-      // Check if the call exists in db:
+      // 🚩 Check if the call exists in db:
+
+      // If the call exists, then join the call:
       socket.join(data.callId);
       console.log(`User ${data.userSocketId} joined call ${data.callId}`);
       socket.to(data.callId).emit(socketEvents.USER_JOINED, data.userSocketId);
@@ -88,7 +91,7 @@ export const mountSendInCallMessageEvent = (io: Server, socket: Socket) => {
   });
 };
 
-// Test Message:
+// Test Message:🚩
 export const mountTestMessageEvent = (socket: Socket) => {
   socket.on("test", (data: any) => {
     console.log("Test message: ", data);

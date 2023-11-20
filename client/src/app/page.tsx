@@ -9,13 +9,14 @@ import FormWrapper from "@/components/Utils/FromWrapper";
 import hero from "@/assets/images/videoCom.png";
 import { initNewCall } from "@/services/socket/call.services";
 import { socket } from "@/services/socket/socket.services";
+import { toastMessage } from "@/components/Notifications/toasts";
 
 export default function Home() {
   const [roomID, setRoomID] = useState("");
   const router = useRouter();
 
   return (
-    <main className="">
+    <main>
       <NavBar />
       <div className="grid grid-cols-2 w-full h-[100vh]  place-items-center">
         <div className="col-span-1">
@@ -36,7 +37,13 @@ export default function Home() {
               <FormWrapper
                 callback={() => {
                   // validate roomID:
-                  if (roomID.length !== 10) return; // 🚩 Invalid roomID
+                  if (roomID.length !== 10) {
+                    toastMessage({
+                      type: "error",
+                      message: "Invalid Room ID.",
+                    });
+                    return;
+                  }
                   router.push(`/${roomID}`);
                 }}
                 formClassNames="flex justify-center gap-2"
@@ -45,8 +52,8 @@ export default function Home() {
                 <input
                   className="glow rounded-full px-4 my-2 text-black outline-none"
                   type="text"
-                  maxLength={10}
                   minLength={10}
+                  maxLength={10}
                   placeholder="Enter Room ID"
                   required
                   value={roomID}

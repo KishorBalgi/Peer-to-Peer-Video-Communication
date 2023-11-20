@@ -1,4 +1,9 @@
 import { useRouter } from "next/navigation";
+import {
+  toastLoading,
+  toastMessage,
+  toastUpdate,
+} from "@/components/Notifications/toasts";
 
 import { socket } from "./socket.services";
 import socketEvents from "@/configs/socket.json";
@@ -11,10 +16,12 @@ import { TSignallingMessage } from "@/types/socket";
 // Initiate a new call:
 export const initNewCall = (navigate: ReturnType<typeof useRouter>) => {
   if (!socket) return; //🚩 !socket
+  const loadingToastId = toastLoading("Starting a new call...");
   socket.emit(
     socketEvents.START_NEW_CALL,
     { userSocketId: socket.id },
     (res: TCallbackResponse) => {
+      toastUpdate(loadingToastId, "success", "Call started!", false);
       navigate.push(`/${res.data.callId}`);
     }
   );
@@ -27,6 +34,7 @@ export const joinExistingCall = async (
 ) => {
   if (!socket) return; //🚩 !socket
 
+  const loadingToastId = toastLoading("Joining call...");
   // Init local stream:
   await initLocalStream();
 
@@ -40,6 +48,7 @@ export const joinExistingCall = async (
       if (res.status === "error") {
         navigate.push("/");
       }
+      toastUpdate(loadingToastId, "success", "You joined", false);
       socket.callId = callId;
     }
   );
@@ -65,8 +74,8 @@ export const leaveCall = () => {
 // User left the call:
 export const userLeftCall = () => {
   socket.on(socketEvents.USER_LEFT, (userSocketId: string) => {
-    console.log("User left the call: ", userSocketId);
     userLeftCallHandler(userSocketId);
+    toastMessage({ type: "info", message: `${userSocketId} left` });
   });
 };
 
