@@ -3,7 +3,7 @@ import { createServer } from "node:http";
 import { Server } from "socket.io";
 import cors from "cors";
 
-import { initiateSocket } from "./socket/socketConfig";
+import { initiateSocket } from "./socket/socketConfig.js";
 import environment from "./configs/environment.json";
 
 import {

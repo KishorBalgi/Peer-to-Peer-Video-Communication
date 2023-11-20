@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import { httpServer } from "./app";
+import { httpServer } from "./app.js";
 
 const port = process.env.PORT || 3000;
 

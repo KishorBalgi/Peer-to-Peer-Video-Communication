@@ -8,7 +8,7 @@ import {
   TSignallingMessage,
   TChatMessage,
   TLeaveCall,
-} from "../types/socketInterfaces";
+} from "../types/socketInterfaces.js";
 
 // Generate a unique call id with uuidv4() of length 10:
 const createCall = () => {
