@@ -4,7 +4,7 @@ import { Server } from "socket.io";
 import cors from "cors";
 
 import { initiateSocket } from "./socket/socketConfig.js";
-import environment from "./configs/environment.json";
+import environment from "./configs/environment.json" assert { type: "json" };
 
 import {
   ServerToClientEvents,

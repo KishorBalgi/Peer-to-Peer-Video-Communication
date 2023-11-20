@@ -1,6 +1,6 @@
 import { Server, Socket } from "socket.io";
 import { v4 as uuidv4 } from "uuid";
-import socketEvents from "../configs/socket.json";
+import socketEvents from "../configs/socket.json" assert { type: "json" };
 import {
   TCallbackResponse,
   TJoinCall,
@@ -9,6 +9,7 @@ import {
   TChatMessage,
   TLeaveCall,
 } from "../types/socketInterfaces.js";
+import { assert } from "console";
 
 // Generate a unique call id with uuidv4() of length 10:
 const createCall = () => {
