@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import NavBar from "@/components/Layout/NavBar";
@@ -12,7 +12,6 @@ import { socket } from "@/services/socket/socket.services";
 import { toastMessage } from "@/components/Notifications/toasts";
 
 export default function Home() {
-  const [roomID, setRoomID] = useState("");
   const router = useRouter();
 
   return (
@@ -35,18 +34,20 @@ export default function Home() {
                 onClick={() => initNewCall(router)}
               />
               <FormWrapper
-                callback={() => {
+                callback={(data: FormData) => {
+                  const roomID = data.get("roomId") as string;
                   // validate roomID:
                   if (roomID.length !== 10) {
                     toastMessage({
                       type: "error",
                       message: "Invalid Room ID.",
                     });
-                    return;
+                    return { status: "error", message: "Invalid Room ID." };
                   }
-                  router.push(`/${roomID}`);
+                  return { status: "success", message: null };
                 }}
-                formClassNames="flex justify-center gap-2"
+                router={router}
+                formClassNames="flex justify-center gap-2 type-0"
                 buttonText="Join Call"
               >
                 <input
@@ -56,8 +57,7 @@ export default function Home() {
                   maxLength={10}
                   placeholder="Enter Room ID"
                   required
-                  value={roomID}
-                  onChange={(e) => setRoomID(e.target.value)}
+                  name="roomId"
                 />
               </FormWrapper>
             </div>

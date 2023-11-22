@@ -7,7 +7,7 @@ import { signup, login } from "../services/auth.services";
 const addCookie = (res: Response, req: Request, token: string) => {
   const cookieOps: CookieOptions = {
     expires: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
-    httpOnly: true,
+    httpOnly: process.env.NODE_ENV === "production",
     secure: req.secure || req.headers["x-forwarded-proto"] === "https",
   };
   if (process.env.NODE_ENV === "production") cookieOps.sameSite = "none";
