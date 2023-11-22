@@ -9,5 +9,6 @@ export const signJWT = (payload: any) => {
 
 // Verify JWT:
 export const verifyJWT = (token: string) => {
-  return jwt.verify(token, secret);
+  const decoded = jwt.verify(token, secret);
+  return decoded;
 };

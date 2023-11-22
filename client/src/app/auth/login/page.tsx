@@ -1,13 +1,21 @@
 "use client";
+import React, { useEffect } from "react";
+import { useSelector } from "react-redux";
 import Image from "next/image";
 import FormWrapper from "@/components/Utils/FromWrapper";
 import hero from "@/assets/images/videoCom.png";
 import { login } from "@/services/auth.services";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { IRootState } from "@/types/redux";
 
 const Login = () => {
   const router = useRouter();
+  const user = useSelector((state: IRootState) => state.user);
+
+  useEffect(() => {
+    if (user.id != "") router.push("/");
+  }, []);
   return (
     <main>
       <div className="grid grid-cols-2 w-full h-[100vh]  place-items-center">

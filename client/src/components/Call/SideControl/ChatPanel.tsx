@@ -6,15 +6,17 @@ import close_icon from "@/assets/icons/close.svg";
 import FormWrapper from "@/components/Utils/FromWrapper";
 import { sendInCallMessage } from "@/services/socket/chat.services";
 import { IRootState } from "@/types/redux";
+import { IFormCallbackResponse } from "@/types/general";
 
 const ChatPanel = ({ close }: { close: () => void }) => {
   const { chats } = useSelector((state: IRootState) => state.chat);
 
-  const handleSend = (data: FormData) => {
+  const handleSend = (data: FormData): IFormCallbackResponse => {
     console.log(data);
     const message = data.get("message") as string;
     console.log("message", message);
     sendInCallMessage(message);
+    return { status: "success", message: "Message sent" };
   };
 
   return (

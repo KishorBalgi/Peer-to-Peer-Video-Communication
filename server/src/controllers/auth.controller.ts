@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction, CookieOptions } from "express";
 import catchAsync from "../utils/catchAsync";
 import { sendResponse } from "../utils/response";
-import { signup, login } from "../services/auth.services";
+import { signup, login, isAuthenticated } from "../services/auth.services";
 
 // Cookie Options for JWT:
 const addCookie = (res: Response, req: Request, token: string) => {
@@ -43,5 +43,30 @@ export const loginController = catchAsync(
 
     addCookie(res, req, user.jwttoken);
     sendResponse(res, 200, user);
+  }
+);
+
+// Is Authenticated:
+export const isAuthenticatedController = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const jwt = req.cookies?.jwt;
+
+    if (!jwt) {
+      throw new Error("Token not found");
+    }
+
+    const user = await isAuthenticated(jwt);
+
+    sendResponse(res, 200, user);
+  }
+);
+
+// Logout:
+export const logoutController = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    res.cookie("jwt", "loggedout", {
+      expires: new Date(Date.now() + 10 * 1000),
+    });
+    sendResponse(res, 200, { message: "Logged out" });
   }
 );

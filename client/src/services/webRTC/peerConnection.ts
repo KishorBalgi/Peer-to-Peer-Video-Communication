@@ -195,10 +195,10 @@ export const leaveCallHandler = (navigate: ReturnType<typeof useRouter>) => {
   // Socket cleanup:
   removeCallListeners();
 
+  toastUpdate(loadingToastId, "success", "You left", false);
+
   // Redirect to home page:
   navigate.push("/");
-
-  toastUpdate(loadingToastId, "success", "You left", false);
 };
 
 // User left call:

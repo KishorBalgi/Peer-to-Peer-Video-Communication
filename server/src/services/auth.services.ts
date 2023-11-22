@@ -62,3 +62,25 @@ export const login = async (data: ILogin) => {
 
   return { ...user, jwttoken: signJWT({ id: user.id }) };
 };
+
+// Is Authenticated:
+export const isAuthenticated = async (token: string) => {
+  const { id } = verifyJWT(token) as { id: string };
+  const user = await prisma.user.findUnique({
+    where: {
+      id,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      createdAt: true,
+    },
+  });
+
+  if (!user) {
+    throw new Error("User does not exist");
+  }
+
+  return { ...user, jwttoken: signJWT({ id: user.id }) };
+};

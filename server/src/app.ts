@@ -1,6 +1,7 @@
 import express from "express";
 import { createServer } from "node:http";
 import { Server } from "socket.io";
+import cookieParser from "cookie-parser";
 import cors from "cors";
 
 import { initiateSocket } from "./socket/socketConfig";
@@ -17,6 +18,8 @@ import {
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
+app.use(express.urlencoded({ extended: true }));
 
 // CORS setup:
 const allowedOrigin =

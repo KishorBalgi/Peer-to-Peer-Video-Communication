@@ -69,14 +69,36 @@ export const login = async (data: FormData): Promise<IFormCallbackResponse> => {
   }
 };
 
+// Is Authenticated:
+export const isAuthenticated = async (): Promise<IFormCallbackResponse> => {
+  try {
+    const res = await api.get("/auth/is-authenticated");
+    if (res.data.status === "success") {
+      const { data } = res.data;
+      const user = {
+        id: data.id,
+        name: data.name,
+        email: data.email,
+        createdAt: data.createdAt,
+      };
+      store.dispatch(addUser(user));
+    }
+    return { status: res.data.status, message: "Authenticated" };
+  } catch (err: any) {
+    return {
+      status: err.response?.data.status,
+      message: err.response?.data.message,
+    };
+  }
+};
+
 // logout:
 export const logout = async (): Promise<IFormCallbackResponse> => {
   try {
-    // const res = await api.get("/auth/logout");
-    // if (res.data.status === "success") {
-    //   store.dispatch(removeUser());
-    // }
-    store.dispatch(removeUser());
+    const res = await api.get("/auth/logout");
+    if (res.data.status === "success") {
+      store.dispatch(removeUser());
+    }
     return { status: "success", message: "Logged Out", redirect: "/" };
   } catch (err: any) {
     return {

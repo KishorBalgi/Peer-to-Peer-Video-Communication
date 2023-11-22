@@ -1,7 +1,8 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
 import NavBar from "@/components/Layout/NavBar";
 import Button from "@/components/Utils/Button";
 import FormWrapper from "@/components/Utils/FromWrapper";
@@ -10,9 +11,19 @@ import hero from "@/assets/images/videoCom.png";
 import { initNewCall } from "@/services/socket/call.services";
 import { socket } from "@/services/socket/socket.services";
 import { toastMessage } from "@/components/Notifications/toasts";
+import { isAuthenticated } from "@/services/auth.services";
+import { IRootState } from "@/types/redux";
 
 export default function Home() {
   const router = useRouter();
+  const user = useSelector((state: IRootState) => state.user);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const auth = await isAuthenticated();
+    };
+    checkAuth();
+  }, []);
 
   return (
     <main>
@@ -31,7 +42,10 @@ export default function Home() {
               <Button
                 buttonClassNames="glow"
                 buttonTitle="New Call"
-                onClick={() => initNewCall(router)}
+                onClick={() => {
+                  if (user.id == "") router.push("/auth/login");
+                  else initNewCall(router);
+                }}
               />
               <FormWrapper
                 callback={(data: FormData) => {
@@ -42,9 +56,16 @@ export default function Home() {
                       type: "error",
                       message: "Invalid Room ID.",
                     });
-                    return { status: "error", message: "Invalid Room ID." };
+                    return {
+                      status: "error",
+                      message: "Invalid Room ID.",
+                    };
                   }
-                  return { status: "success", message: null };
+                  return {
+                    status: "success",
+                    message: null,
+                    redirect: `/${roomID}`,
+                  };
                 }}
                 router={router}
                 formClassNames="flex justify-center gap-2 type-0"
