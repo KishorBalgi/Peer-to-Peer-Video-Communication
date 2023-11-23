@@ -24,7 +24,15 @@ export const initLocalStream = async () => {
     localStream.getAudioTracks()[0].enabled = false;
 
     addPeer(socket.id, { stream: localStream, connection: null });
-    store.dispatch(addLocalStream({ peerId: socket.id }));
+    store.dispatch(
+      addLocalStream({
+        peerId: socket.id,
+        user: {
+          id: store.getState().user.id,
+          name: store.getState().user.name,
+        },
+      })
+    );
 
     // New user joined the call:
     newUserJoinedCall();
