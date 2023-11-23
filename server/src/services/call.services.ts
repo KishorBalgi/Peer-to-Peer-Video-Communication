@@ -26,3 +26,19 @@ export const getCallById = async (callId: string) => {
   });
   return call;
 };
+
+// Get all calls:
+export const getAllCalls = async () => {
+  const calls = await prisma.call.findMany();
+  return calls;
+};
+
+// Delete a call by id:
+export const deleteCallById = async (callId: string) => {
+  const call = await prisma.call.delete({
+    where: {
+      callId: callId,
+    },
+  });
+  return call;
+};
