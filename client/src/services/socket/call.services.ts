@@ -17,8 +17,11 @@ export const initNewCall = (navigate: ReturnType<typeof useRouter>) => {
     socketEvents.START_NEW_CALL,
     { userSocketId: socket.id },
     (res: TCallbackResponse) => {
-      toastUpdate(loadingToastId, "success", "Call started!", false);
-      navigate.push(`/${res.data.callId}`);
+      if (res.status === "success") {
+        toastUpdate(loadingToastId, "success", "Call started!", false);
+        return navigate.push(`/${res.data.callId}`);
+      }
+      toastUpdate(loadingToastId, "error", res.message, false);
     }
   );
 };
@@ -42,9 +45,9 @@ export const joinExistingCall = async (
     },
     (res: TCallbackResponse) => {
       if (res.status === "error") {
-        navigate.push("/");
+        toastUpdate(loadingToastId, "error", res.message, false);
+        return navigate.push("/");
       }
-      console.log("res", res);
       toastUpdate(loadingToastId, "success", "You joined", false);
       socket.callId = callId;
     }

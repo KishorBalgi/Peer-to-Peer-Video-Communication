@@ -10,29 +10,43 @@ import {
   TChatMessage,
   TLeaveCall,
 } from "../types/socketInterfaces";
+import { createCall, getCallById } from "../services/call.services";
 
 // Generate a unique call id with uuidv4() of length 10:
-const createCall = () => {
+interface INewCall {
+  callId: string;
+  userId: string;
+  createdAt: Date;
+}
+const createNewCall = async (userId: string): Promise<INewCall> => {
   const callId = uuidv4().replace(/-/g, "").slice(0, 10);
 
-  // 🚩
   //   1. check if the call id already exists in the database:
+  const call = await getCallById(callId);
   //   2. if it does, then generate a new call id:
+  if (call) {
+    return await createNewCall(userId);
+  }
+
+  // Store the call id in the database:
+  const newCall = await createCall({
+    callId,
+    userId,
+  });
 
   // return callId;
-  return "1234567890";
+  return newCall;
 };
 
 // Start a new call event:
 export const mountStartNewCallEvent = (socket: Socket) => {
   socket.on(
     socketEvents.START_NEW_CALL,
-    (data: TCreateCall, callback: (res: TCallbackResponse) => void) => {
+    async (data: TCreateCall, callback: (res: TCallbackResponse) => void) => {
+      const userId = socket.data.user.id;
       // Creata a new call:
-      const callDetails = {
-        callId: createCall(),
-      };
-
+      const callDetails = await createNewCall(userId);
+      console.log("callDetails", callDetails);
       // Send the call details to the client:
       callback(
         socketResponse({
@@ -49,8 +63,21 @@ export const mountStartNewCallEvent = (socket: Socket) => {
 export const mountJoinCallEvent = (socket: Socket) => {
   socket.on(
     socketEvents.JOIN_CALL,
-    (data: TJoinCall, callback: (res: TCallbackResponse) => void) => {
+    async (data: TJoinCall, callback: (res: TCallbackResponse) => void) => {
       // 🚩 Check if the call exists in db:
+      const call = await getCallById(data.callId);
+      console.log("call", call);
+
+      // If the call does not exist, then send an error:
+      if (!call) {
+        return callback(
+          socketResponse({
+            status: "error",
+            message: "Call does not exist",
+            data: null,
+          })
+        );
+      }
 
       // If the call exists, then join the call:
       data.user = {
