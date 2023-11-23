@@ -7,6 +7,8 @@ import mic_on from "@/assets/icons/mic-on.svg";
 import video_off from "@/assets/icons/video-off.svg";
 import { getPeer } from "@/redux/features/call/peerStore";
 import { socket } from "@/services/socket/socket.services";
+import { useSelector } from "react-redux";
+import { IRootState } from "@/types/redux";
 
 type VideoContainerProps = {
   peerId: string;
@@ -16,6 +18,9 @@ const VideoContainer = ({ peerId }: VideoContainerProps) => {
   const [micEnabled, setMicEnabled] = useState(false);
   const [videoEnabled, setVideoEnabled] = useState(false);
   const stream = getPeer(peerId)?.stream;
+  const peer = useSelector((state: IRootState) => {
+    return state.call.remoteStreams.find((p) => p.peerId === peerId);
+  });
 
   useEffect(() => {
     if (!stream) return;
@@ -65,7 +70,9 @@ const VideoContainer = ({ peerId }: VideoContainerProps) => {
           className="w-24 h-24 bg-gray-700 rounded-full p-2"
         />
       )}
-      <p className="absolute bottom-0 left-0 m-2 font-semibold">{peerId}</p>
+      <p className="absolute bottom-0 left-0 m-2 font-semibold">
+        {peer?.user.name}
+      </p>
     </div>
   );
 };

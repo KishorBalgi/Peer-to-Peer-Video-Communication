@@ -23,7 +23,9 @@ export const signup = async (
         name: data.name,
         email: data.email,
         createdAt: data.createdAt,
+        token: res.data.jwttoken,
       };
+      localStorage.setItem("jwt", res.data.jwttoken);
       store.dispatch(addUser(user));
       return {
         status: res.data.status,
@@ -55,7 +57,10 @@ export const login = async (data: FormData): Promise<IFormCallbackResponse> => {
         name: data.name,
         email: data.email,
         createdAt: data.createdAt,
+        token: res.data.jwttoken,
       };
+      console.log(res.data);
+      localStorage.setItem("jwt", res.data.jwttoken);
       store.dispatch(addUser(user));
       return { status: res.data.status, message: "Logged In", redirect: "/" };
     }
@@ -80,6 +85,7 @@ export const isAuthenticated = async (): Promise<IFormCallbackResponse> => {
         name: data.name,
         email: data.email,
         createdAt: data.createdAt,
+        token: res.data.jwttoken,
       };
       store.dispatch(addUser(user));
     }
@@ -99,6 +105,7 @@ export const logout = async (): Promise<IFormCallbackResponse> => {
     if (res.data.status === "success") {
       store.dispatch(removeUser());
     }
+    localStorage.setItem("jwt", "");
     return { status: "success", message: "Logged Out", redirect: "/" };
   } catch (err: any) {
     return {

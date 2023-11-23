@@ -1,11 +1,15 @@
 import io, { Socket } from "socket.io-client";
+import { store } from "@/redux/store";
+
 interface ISocketInstance extends Socket {
-  // add default roomId as "":
   callId?: string;
 }
 export const socket: ISocketInstance = io(
   process.env.NEXT_PUBLIC_SOCKET_URL as string,
   {
+    auth: {
+      token: store.getState().user.token,
+    },
     withCredentials: true,
   }
 );

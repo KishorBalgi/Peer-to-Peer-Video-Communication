@@ -25,6 +25,11 @@ export default function Home() {
     checkAuth();
   }, []);
 
+  useEffect(() => {
+    if (user.id !== "") socket.connect();
+    else socket.disconnect();
+  }, [user]);
+
   return (
     <main>
       <NavBar />

@@ -50,7 +50,6 @@ const Login = () => {
                     autoComplete="email"
                     required
                     className="mt-1 p-2 w-full rounded-full outline-none"
-                    value={"admin@kb.com"}
                   />
                 </div>
                 <div>

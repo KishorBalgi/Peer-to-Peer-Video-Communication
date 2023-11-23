@@ -1,4 +1,5 @@
 import { Server, Socket } from "socket.io";
+import AppError from "../utils/appError";
 import { v4 as uuidv4 } from "uuid";
 import socketEvents from "../configs/socket.json";
 import {
@@ -52,16 +53,17 @@ export const mountJoinCallEvent = (socket: Socket) => {
       // 🚩 Check if the call exists in db:
 
       // If the call exists, then join the call:
+      data.user = {
+        id: socket.data.user.id,
+        name: socket.data.user.name,
+      };
       socket.join(data.callId);
       console.log(
         `User ${data.user.id} : ${data.user.name} joined call ${data.callId}`
       );
       socket.to(data.callId).emit(socketEvents.USER_JOINED, {
         userSocketId: data.userSocketId,
-        user: {
-          id: data.user.id,
-          name: data.user.name,
-        },
+        user: data.user,
       });
 
       callback(

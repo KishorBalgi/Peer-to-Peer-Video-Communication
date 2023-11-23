@@ -17,6 +17,7 @@ import {
   ClientToServerEvents,
 } from "./types/socketInterfaces";
 import { JwtPayload } from "jsonwebtoken";
+import AppError from "./utils/appError";
 
 // Express setup:
 const app = express();
@@ -56,29 +57,31 @@ const io = new Server<ServerToClientEvents, ClientToServerEvents>(httpServer, {
 });
 
 // Socket Auth:
-io.use((socket, next) => {
-  const token = socket.handshake.auth.token;
-  console.log(token);
-  if (!token) {
-    return next(new Error("Authentication error"));
+io.use(async (socket, next) => {
+  try {
+    const token = socket.handshake.headers.cookie?.split("=")[1];
+    if (!token) {
+      return new Error("Authentication error");
+    }
+
+    // Verify token:
+    const { id } = verifyJWT(token as string) as JwtPayload;
+    if (!id) {
+      return new Error("Authentication error");
+    }
+
+    // Get user from db:
+    const user = await getUser(id);
+    if (!user) {
+      return new Error("Authentication error");
+    }
+
+    // Add user to socket:
+    socket.data.user = user;
+    next();
+  } catch (err: any) {
+    return next(new AppError(401, err.message));
   }
-
-  // Verify token:
-  const { id } = verifyJWT(token as string) as JwtPayload;
-  if (!id) {
-    return next(new Error("Authentication error"));
-  }
-
-  // Get user from db:
-  const user = getUser(id);
-  if (!user) {
-    return next(new Error("Authentication error"));
-  }
-
-  // Add user to socket:
-  socket.data.user = user;
-
-  next();
 });
 
 // Set io to app instead of global:

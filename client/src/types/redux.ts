@@ -11,11 +11,13 @@ export interface IUser {
   name: string;
   email: string;
   createdAt: string;
+  token: string;
 }
 
 // Stream:
 export interface IStream {
   peerId: string;
+  user: Pick<IUser, "id" | "name">;
 }
 
 // Call:
