@@ -33,17 +33,17 @@ export default function Home() {
   return (
     <main>
       <NavBar />
-      <div className="grid grid-cols-2 w-full h-[100vh]  place-items-center">
+      <div className="grid grid-cols-2 max-lg:grid-cols-1 w-full h-[100vh] max-lg:h-[80vh] max-lg:my-20 place-items-center">
         <div className="col-span-1">
           <Image src={hero} alt="hero" className=" w-3/5 h-auto mx-auto" />
         </div>
         <div className="col-span-1">
-          <div className="flex flex-col gap-2">
-            <h1 className=" text-6xl font-bold">Video Chat</h1>
-            <p className="text-xl font-semibold">
+          <div className="flex flex-col gap-2 mx-5">
+            <h1 className="text-6xl max-md:text-3xl font-bold">Video Chat</h1>
+            <p className="text-xl max-lg:md max-md:text-sm font-semibold">
               Video chat with your friends and family with ease.
             </p>
-            <div className="flex justify-center gap-2">
+            <div className="flex max-md:flex-col justify-center gap-2">
               <Button
                 buttonClassNames="glow"
                 buttonTitle="New Call"
@@ -73,11 +73,12 @@ export default function Home() {
                   };
                 }}
                 router={router}
-                formClassNames="flex justify-center gap-2 type-0"
+                formClassNames="flex max-md:flex-col justify-center gap-2 type-0"
+                buttonWrapperClassNames="flex max-md:justify-right"
                 buttonText="Join Call"
               >
                 <input
-                  className="glow rounded-full px-4 my-2 text-black outline-none"
+                  className="glow rounded-full px-4 max-md:py-2 my-2 text-black outline-none"
                   type="text"
                   minLength={10}
                   maxLength={10}
