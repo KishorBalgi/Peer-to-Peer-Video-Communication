@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction, CookieOptions } from "express";
+import AppError from "../utils/appError";
 import catchAsync from "../utils/catchAsync";
 import { sendResponse } from "../utils/response";
 import { signup, login, isAuthenticated } from "../services/auth.services";
@@ -20,7 +21,7 @@ export const signupController = catchAsync(
     const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
-      throw new Error("Please provide all fields");
+      throw next(new AppError(400, "Please provide all fields"));
     }
 
     const user = await signup({ name, email, password });
@@ -36,7 +37,7 @@ export const loginController = catchAsync(
     const { email, password } = req.body;
 
     if (!email || !password) {
-      throw new Error("Please provide all fields");
+      throw next(new AppError(400, "Please provide all fields"));
     }
 
     const user = await login({ email, password });
@@ -52,7 +53,7 @@ export const isAuthenticatedController = catchAsync(
     const jwt = req.cookies?.jwt;
 
     if (!jwt) {
-      throw new Error("Token not found");
+      throw next(new AppError(401, "Please login to continue"));
     }
 
     const user = await isAuthenticated(jwt);

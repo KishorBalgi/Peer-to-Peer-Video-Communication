@@ -53,8 +53,16 @@ export const mountJoinCallEvent = (socket: Socket) => {
 
       // If the call exists, then join the call:
       socket.join(data.callId);
-      console.log(`User ${data.userSocketId} joined call ${data.callId}`);
-      socket.to(data.callId).emit(socketEvents.USER_JOINED, data.userSocketId);
+      console.log(
+        `User ${data.user.id} : ${data.user.name} joined call ${data.callId}`
+      );
+      socket.to(data.callId).emit(socketEvents.USER_JOINED, {
+        userSocketId: data.userSocketId,
+        user: {
+          id: data.user.id,
+          name: data.user.name,
+        },
+      });
 
       callback(
         socketResponse({
