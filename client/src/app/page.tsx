@@ -1,7 +1,8 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
 import NavBar from "@/components/Layout/NavBar";
 import Button from "@/components/Utils/Button";
 import FormWrapper from "@/components/Utils/FromWrapper";
@@ -10,10 +11,24 @@ import hero from "@/assets/images/videoCom.png";
 import { initNewCall } from "@/services/socket/call.services";
 import { socket } from "@/services/socket/socket.services";
 import { toastMessage } from "@/components/Notifications/toasts";
+import { isAuthenticated } from "@/services/auth.services";
+import { IRootState } from "@/types/redux";
 
 export default function Home() {
-  const [roomID, setRoomID] = useState("");
   const router = useRouter();
+  const user = useSelector((state: IRootState) => state.user);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const auth = await isAuthenticated();
+    };
+    checkAuth();
+  }, []);
+
+  useEffect(() => {
+    if (user.id !== "") socket.connect();
+    else socket.disconnect();
+  }, [user]);
 
   return (
     <main>
@@ -32,21 +47,33 @@ export default function Home() {
               <Button
                 buttonClassNames="glow"
                 buttonTitle="New Call"
-                onClick={() => initNewCall(router)}
+                onClick={() => {
+                  if (user.id == "") router.push("/auth/login");
+                  else initNewCall(router);
+                }}
               />
               <FormWrapper
-                callback={() => {
+                callback={(data: FormData) => {
+                  const roomID = data.get("roomId") as string;
                   // validate roomID:
                   if (roomID.length !== 10) {
                     toastMessage({
                       type: "error",
                       message: "Invalid Room ID.",
                     });
-                    return;
+                    return {
+                      status: "error",
+                      message: "Invalid Room ID.",
+                    };
                   }
-                  router.push(`/${roomID}`);
+                  return {
+                    status: "success",
+                    message: null,
+                    redirect: `/${roomID}`,
+                  };
                 }}
-                formClassNames="flex justify-center gap-2"
+                router={router}
+                formClassNames="flex justify-center gap-2 type-0"
                 buttonText="Join Call"
               >
                 <input
@@ -56,8 +83,7 @@ export default function Home() {
                   maxLength={10}
                   placeholder="Enter Room ID"
                   required
-                  value={roomID}
-                  onChange={(e) => setRoomID(e.target.value)}
+                  name="roomId"
                 />
               </FormWrapper>
             </div>

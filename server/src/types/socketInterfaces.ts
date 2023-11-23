@@ -9,6 +9,10 @@ export type TCallbackResponse = {
 export type TJoinCall = {
   callId: string;
   userSocketId: string;
+  user: {
+    id: string;
+    name: string;
+  };
 };
 
 // Leave Call:

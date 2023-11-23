@@ -2,11 +2,22 @@
 export interface IRootState {
   call: ICall;
   chat: IChat;
+  user: IUser;
+}
+
+// User:
+export interface IUser {
+  id: string;
+  name: string;
+  email: string;
+  createdAt: string;
+  token: string;
 }
 
 // Stream:
 export interface IStream {
   peerId: string;
+  user: Pick<IUser, "id" | "name">;
 }
 
 // Call:
