@@ -1,16 +1,12 @@
 import { useRouter } from "next/navigation";
-import {
-  toastLoading,
-  toastMessage,
-  toastUpdate,
-} from "@/components/Notifications/toasts";
+import { toastLoading, toastUpdate } from "@/components/Notifications/toasts";
 
 import { socket } from "./socket.services";
 import socketEvents from "@/configs/socket.json";
 import { initLocalStream } from "@/services/webRTC/init";
 import { handleSignallingMessage } from "../webRTC/peerConnection";
 import { createOffer, userLeftCallHandler } from "../webRTC/peerConnection";
-import { TCallbackResponse } from "@/types/socket";
+import { TCallbackResponse, TUserJoined } from "@/types/socket";
 import { TSignallingMessage } from "@/types/socket";
 
 // Initiate a new call:
@@ -48,6 +44,7 @@ export const joinExistingCall = async (
       if (res.status === "error") {
         navigate.push("/");
       }
+      console.log("res", res);
       toastUpdate(loadingToastId, "success", "You joined", false);
       socket.callId = callId;
     }
@@ -56,10 +53,8 @@ export const joinExistingCall = async (
 
 // New user joined the call:
 export const newUserJoinedCall = () => {
-  socket.on(socketEvents.USER_JOINED, (userSocketId: string) => {
-    console.log("New user joined the call: ", userSocketId);
-    // socket.emit("test", { to: userSocketId, msg: "Hello" });
-    createOffer(userSocketId);
+  socket.on(socketEvents.USER_JOINED, (data: TUserJoined) => {
+    createOffer(data);
   });
 };
 
@@ -75,7 +70,6 @@ export const leaveCall = () => {
 export const userLeftCall = () => {
   socket.on(socketEvents.USER_LEFT, (userSocketId: string) => {
     userLeftCallHandler(userSocketId);
-    toastMessage({ type: "info", message: `${userSocketId} left` });
   });
 };
 
