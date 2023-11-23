@@ -12,6 +12,8 @@ import { verifyJWT } from "./utils/jwt.utils";
 
 import authRoutes from "./routes/auth.routes";
 
+import authRoutes from "./routes/auth.routes";
+
 import {
   ServerToClientEvents,
   ClientToServerEvents,
