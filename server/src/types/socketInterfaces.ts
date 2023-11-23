@@ -24,6 +24,7 @@ export type TLeaveCall = {
 // Create Call:
 export type TCreateCall = {
   userSocketId: string;
+  userId: string;
 };
 
 // Chat message:

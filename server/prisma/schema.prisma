@@ -19,4 +19,13 @@ model User{
   active Boolean @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  calls Call[]
+}
+
+// Call Schema:
+model Call{
+  callId String @id
+  userId String
+  user User @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
 }
