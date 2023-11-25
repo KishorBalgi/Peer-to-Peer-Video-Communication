@@ -6,8 +6,8 @@ import info from "@/assets/icons/info.svg";
 
 import Button from "@/components/Utils/Button";
 import InfoPanel from "./InfoPanel";
-import ChatPanel from "./ChatPanel";
-import ParticipantsPanel from "./ParticipantsPanel";
+import ChatPanel from "./Chat/ChatPanel";
+import ParticipantsPanel from "./Participants/ParticipantsPanel";
 
 const SideControlPanel = () => {
   const [showChat, setShowChat] = useState(false);

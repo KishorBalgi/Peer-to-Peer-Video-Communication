@@ -1,6 +1,7 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import { useSelector } from "react-redux";
+import Chat from "./Chat";
 import Button from "@/components/Utils/Button";
 import close_icon from "@/assets/icons/close.svg";
 import FormWrapper from "@/components/Utils/FromWrapper";
@@ -12,16 +13,16 @@ const ChatPanel = ({ close }: { close: () => void }) => {
   const { chats } = useSelector((state: IRootState) => state.chat);
 
   const handleSend = (data: FormData): IFormCallbackResponse => {
-    console.log(data);
     const message = data.get("message") as string;
-    console.log("message", message);
+    if (message == "")
+      return { status: "error", message: "Message cannot be empty" };
     sendInCallMessage(message);
     return { status: "success", message: "Message sent" };
   };
 
   return (
-    <div className="relative w-[20vw] bg-white rounded-lg text-black h-[80vh] mx-5">
-      <div className="flex justify-between items-center mb-5 p-5">
+    <div className="w-[20vw] flex flex-col bg-white rounded-lg text-black h-[80vh] mx-5">
+      <div className="h-fit flex justify-between items-center mb-1 px-5 py-2">
         <h1 className="text-xl font-semibold">Chats</h1>
         <Button
           buttonClassNames="!bg-gray-200 !p-1"
@@ -30,15 +31,12 @@ const ChatPanel = ({ close }: { close: () => void }) => {
         />
       </div>
       <hr className="border-solid border-black" />
-      <div className="my-5 p-5">
+      <div className="px-2 h-full overflow-y-scroll">
         {chats.map((chat, index) => (
-          <div key={index}>
-            <h1 className="font-semibold">{chat.from}</h1>
-            <p>{chat.message}</p>
-          </div>
+          <Chat key={index} chat={chat} />
         ))}
       </div>
-      <div className="absolute bottom-0 my-2 px-2">
+      <div className="bottom-0 my-2 px-2">
         <FormWrapper
           callback={handleSend}
           buttonText="Send"

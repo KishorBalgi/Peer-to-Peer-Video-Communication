@@ -57,7 +57,9 @@ export const toggleVideoAudio = async (
   streamData: IStream,
   toggle: "video" | "audio"
 ) => {
+  const peer = getPeer(streamData.peerId);
   const stream = getPeer(streamData.peerId)?.stream;
+  const peerConnection = getPeer(streamData.peerId)?.connection;
   if (!stream) return console.log("Stream not found");
 
   // For video:

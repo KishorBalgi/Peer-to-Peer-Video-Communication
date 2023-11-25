@@ -27,15 +27,14 @@ const createRTCPeerConnection = async (data: TUserJoined) => {
   const { userSocketId, user } = data;
   let peerConnection: RTCPeerConnection = new RTCPeerConnection(configuration);
 
-  console.log("New Peer Connection:", peerConnection);
   const localStream = getPeer(socket.id)?.stream;
 
   if (!localStream) return console.log("Local stream not found");
 
   // Add local stream to peer connection:
-  localStream.getTracks().forEach((track) => {
-    peerConnection.addTrack(track, localStream);
-  });
+  // localStream.getTracks().forEach((track) => {
+  //   peerConnection.addTrack(track, localStream);
+  // });
 
   let remoteStream: MediaStream = new MediaStream();
 
@@ -191,18 +190,20 @@ export const leaveCallHandler = (navigate: ReturnType<typeof useRouter>) => {
   // Close all peer connections and remove remote streams:
   peerIds.forEach((peerId) => {
     const peerConnection = getPeer(peerId)?.connection;
-    if (!peerConnection) return console.log("Leave call: Peer not found");
-    peerConnection.close();
-    removePeer(peerId);
+    if (peerConnection) {
+      peerConnection.close();
+      removePeer(peerId);
+    }
     store.dispatch(removeRemoteStream(peerId));
   });
 
   // Close local stream:
   const localStream = getPeer(socket.id)?.stream;
-  if (!localStream) return console.log("Local stream not found");
-  localStream.getTracks().forEach((track) => track.stop());
-  removePeer(socket.id);
-  store.dispatch(removeLocalStream());
+  if (localStream) {
+    localStream.getTracks().forEach((track) => track.stop());
+    removePeer(socket.id);
+    store.dispatch(removeLocalStream());
+  }
   // Send user left socket event:
   leaveCall();
 

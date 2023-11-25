@@ -55,7 +55,7 @@ const VideoContainer = ({ peerId }: VideoContainerProps) => {
       )}
       {true ? (
         <video
-          className=" bg-black rounded-lg"
+          className="h-full bg-black rounded-lg"
           autoPlay
           muted={peerId === socket.id}
           ref={(video) => {
