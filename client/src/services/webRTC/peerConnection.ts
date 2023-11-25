@@ -228,3 +228,22 @@ export const userLeftCallHandler = (peerId: string) => {
   removePeer(peerId);
   store.dispatch(removeRemoteStream(peerId));
 };
+
+// Update tracks:
+export const updateTracks = (stream: MediaStream) => {
+  const peers = store.getState().call.remoteStreams;
+
+  peers.forEach((peer) => {
+    const peerConnection = getPeer(peer.peerId)?.connection;
+    if (!peerConnection) return console.log("Update tracks: Peer not found");
+
+    peerConnection.getSenders().forEach((sender) => {
+      if (sender.track?.kind === "audio") {
+        sender.replaceTrack(stream.getAudioTracks()[0]);
+      }
+      if (sender.track?.kind === "video") {
+        sender.replaceTrack(stream.getVideoTracks()[0]);
+      }
+    });
+  });
+};
