@@ -32,9 +32,9 @@ const createRTCPeerConnection = async (data: TUserJoined) => {
   if (!localStream) return console.log("Local stream not found");
 
   // Add local stream to peer connection:
-  // localStream.getTracks().forEach((track) => {
-  //   peerConnection.addTrack(track, localStream);
-  // });
+  localStream.getTracks().forEach((track) => {
+    peerConnection.addTrack(track, localStream);
+  });
 
   let remoteStream: MediaStream = new MediaStream();
 

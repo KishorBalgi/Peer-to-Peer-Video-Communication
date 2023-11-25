@@ -66,7 +66,6 @@ export const mountJoinCallEvent = (socket: Socket) => {
     async (data: TJoinCall, callback: (res: TCallbackResponse) => void) => {
       // 🚩 Check if the call exists in db:
       const call = await getCallById(data.callId);
-      console.log("call", call);
 
       // If the call does not exist, then send an error:
       if (!call) {
