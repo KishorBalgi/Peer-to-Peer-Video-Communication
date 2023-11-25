@@ -1,5 +1,6 @@
 {
   "JOIN_CALL": "join_call",
+  "CHECK_CALL_EXISTS": "check_call_exists",
   "LEAVE_CALL": "leave_call",
   "USER_JOINED": "user_joined",
   "USER_LEFT": "user_left",

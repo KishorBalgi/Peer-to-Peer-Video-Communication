@@ -24,7 +24,7 @@ const VideoContainer = ({ peerId }: VideoContainerProps) => {
 
   useEffect(() => {
     if (!stream) return;
-    // console.log(stream);
+    console.log(stream);
     const updateStreamStatus = () => {
       setMicEnabled(stream.getAudioTracks()[0]?.enabled);
       setVideoEnabled(stream.getVideoTracks()[0]?.enabled);
@@ -71,7 +71,7 @@ const VideoContainer = ({ peerId }: VideoContainerProps) => {
         />
       )}
       <p className="absolute bottom-0 left-0 m-2 font-semibold">
-        {peer?.user.name}
+        {peer?.user.name || "You"}
       </p>
     </div>
   );

@@ -59,6 +59,32 @@ export const mountStartNewCallEvent = (socket: Socket) => {
   );
 };
 
+// Check if the call exists:
+export const mountCheckCallExistsEvent = (socket: Socket) => {
+  socket.on(
+    socketEvents.CHECK_CALL_EXISTS,
+    async (data: string, callback: (res: TCallbackResponse) => void) => {
+      const call = await getCallById(data);
+      if (!call) {
+        return callback(
+          socketResponse({
+            status: "error",
+            message: "Call does not exist",
+            data: null,
+          })
+        );
+      }
+      callback(
+        socketResponse({
+          status: "success",
+          message: "Call exists",
+          data: null,
+        })
+      );
+    }
+  );
+};
+
 // Join a call event:
 export const mountJoinCallEvent = (socket: Socket) => {
   socket.on(

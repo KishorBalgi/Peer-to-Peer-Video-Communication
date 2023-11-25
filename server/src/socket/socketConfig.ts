@@ -7,6 +7,7 @@ import {
   mountTestMessageEvent,
   mountSendInCallMessageEvent,
   mountLeaveCallEvent,
+  mountCheckCallExistsEvent,
 } from "./socketEventHandlers";
 import AppError from "../utils/appError";
 
@@ -20,6 +21,7 @@ const initiateSocket = (io: Server) => {
 
       // Mount socket events:
       mountJoinCallEvent(socket);
+      mountCheckCallExistsEvent(socket);
       mountStartNewCallEvent(socket);
       mountSignallingMessageEvent(socket);
       mountSendInCallMessageEvent(io, socket);

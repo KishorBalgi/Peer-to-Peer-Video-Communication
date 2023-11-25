@@ -4,7 +4,10 @@ import { toastLoading, toastUpdate } from "@/components/Notifications/toasts";
 import { socket } from "./socket.services";
 import socketEvents from "@/configs/socket.json";
 import { initLocalStream } from "@/services/webRTC/init";
-import { handleSignallingMessage } from "../webRTC/peerConnection";
+import {
+  handleSignallingMessage,
+  leaveCallHandler,
+} from "../webRTC/peerConnection";
 import { createOffer, userLeftCallHandler } from "../webRTC/peerConnection";
 import { TCallbackResponse, TUserJoined } from "@/types/socket";
 import { TSignallingMessage } from "@/types/socket";
@@ -27,29 +30,41 @@ export const initNewCall = (navigate: ReturnType<typeof useRouter>) => {
 };
 
 // Join an existing call:
-export const joinExistingCall = async (
+export const joinExistingCall = (
   callId: string,
   navigate: ReturnType<typeof useRouter>
 ) => {
   if (!socket) return; //🚩 !socket
 
   const loadingToastId = toastLoading("Joining call...");
-  // Init local stream:
-  await initLocalStream();
 
   socket.emit(
-    socketEvents.JOIN_CALL,
-    {
-      callId,
-      userSocketId: socket.id,
-    },
-    (res: TCallbackResponse) => {
+    socketEvents.CHECK_CALL_EXISTS,
+    callId,
+    async (res: TCallbackResponse) => {
       if (res.status === "error") {
         toastUpdate(loadingToastId, "error", res.message, false);
         return navigate.push("/");
       }
-      toastUpdate(loadingToastId, "success", "You joined", false);
-      socket.callId = callId;
+      // Init local stream:
+      await initLocalStream();
+
+      // Join call:
+      socket.emit(
+        socketEvents.JOIN_CALL,
+        {
+          callId,
+          userSocketId: socket.id,
+        },
+        (res: TCallbackResponse) => {
+          if (res.status === "error") {
+            toastUpdate(loadingToastId, "error", res.message, false);
+            return navigate.push("/");
+          }
+          toastUpdate(loadingToastId, "success", "You joined", false);
+          socket.callId = callId;
+        }
+      );
     }
   );
 };

@@ -60,4 +60,8 @@ export interface ClientToServerEvents {
   signal_msg: (data: TSignallingMessage) => void;
   chat_msg: (data: TChatMessage) => void;
   leave_call: (data: TLeaveCall) => void;
+  check_call_exists: (
+    data: string,
+    callback: (res: TCallbackResponse) => void
+  ) => void;
 }

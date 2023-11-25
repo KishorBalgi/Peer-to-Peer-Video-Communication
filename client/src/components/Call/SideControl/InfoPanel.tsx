@@ -17,8 +17,9 @@ const InfoPanel = ({ close }: { close: () => void }) => {
       </div>
       <hr className=" border-solid border-black" />
       <div className="my-5 px-2">
-        <h1>Meeting Link:</h1>
-        <p className="text-blue-500 text-sm py-2">{`${window.location.origin}/${socket.callId}`}</p>
+        <h1>Meeting ID:</h1>
+        {/* <p className="text-blue-500 text-sm py-2">{`${window.location.origin}/${socket.callId}`}</p> */}
+        <p className="text-blue-500 text-sm py-2">{`${socket.callId}`}</p>
       </div>
     </div>
   );
