@@ -59,13 +59,13 @@ const ControlPanel = () => {
           }`}
           onClick={handelVideo}
         />
-        <Button
+        {/* <Button
           buttonIcon={screen ? screen_share : screen_share_off}
           buttonClassNames={`py-4 m-0 ${
             screen ? "!bg-green-500" : "!bg-red-500"
           }`}
           onClick={handelScreen}
-        />
+        /> */}
         <Button buttonIcon={setting} buttonClassNames="py-4 m-0 !bg-gray-100" />
         <Button
           buttonIcon={end_call}

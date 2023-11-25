@@ -1,14 +1,18 @@
 import express from "express";
 import { createServer } from "node:http";
-import { Server, Socket } from "socket.io";
+import { Server } from "socket.io";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import helmet from "helmet";
+import { rateLimit } from "express-rate-limit";
+import hpp from "hpp";
+import compression from "compression";
 
+import AppError from "./utils/appError";
 import { globalErrorHandler } from "./controllers/error.controller";
 import { initiateSocket } from "./socket/socketConfig";
 import environment from "./configs/environment.json";
 import { getUser } from "./services/user.services";
-import { verifyJWT } from "./utils/jwt.utils";
 
 import authRoutes from "./routes/auth.routes";
 
@@ -17,14 +21,34 @@ import {
   ClientToServerEvents,
 } from "./types/socketInterfaces";
 import { JwtPayload } from "jsonwebtoken";
-import AppError from "./utils/appError";
+import { verifyJWT } from "./utils/jwt.utils";
 
 // Express setup:
 const app = express();
 
-app.use(express.json());
+app.use(
+  express.json({
+    limit: "10kb",
+  })
+);
 app.use(cookieParser());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: "10kb" }));
+
+// Security setup:
+app.use(helmet());
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+
+app.use(limiter);
+
+app.use(hpp());
+
+app.use(compression());
 
 // CORS setup:
 const allowedOrigin =

@@ -10,7 +10,9 @@ const NavBar = () => {
   return (
     <nav className="glow fixed top-2 flex justify-between items-center w-1/2 max-sm:w-11/12 left-1/2 -translate-x-1/2 my-5 px-5 py-3 rounded-full bg-secondary">
       <div>
-        <h1 className="text-2xl font-bold">VidChat</h1>
+        <Link href="/">
+          <h1 className="text-2xl font-bold">VidChat</h1>
+        </Link>
       </div>
       <div>
         <ul className="flex gap-3 items-center">

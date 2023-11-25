@@ -42,6 +42,7 @@ const FormWrapper = ({
 
           if (res.status === "success") {
             toastUpdate(toastId, "success", res.message as string, false);
+            formRef.current?.reset();
             if (res.redirect) {
               router?.push(res.redirect);
             }
