@@ -35,7 +35,7 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 
 // Security setup:
-app.enable("trust proxy");
+// app.enable("trust proxy");
 
 app.use(helmet());
 
