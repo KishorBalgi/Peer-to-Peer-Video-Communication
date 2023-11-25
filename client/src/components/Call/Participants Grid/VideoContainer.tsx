@@ -22,27 +22,27 @@ const VideoContainer = ({ peerId }: VideoContainerProps) => {
     return state.call.remoteStreams.find((p) => p.peerId === peerId);
   });
 
-  useEffect(() => {
-    if (!stream) return;
-    console.log(stream);
-    const updateStreamStatus = () => {
-      setMicEnabled(stream.getAudioTracks()[0]?.enabled);
-      setVideoEnabled(stream.getVideoTracks()[0]?.enabled);
-    };
-    updateStreamStatus();
+  // useEffect(() => {
+  //   if (!stream) return;
+  //   console.log(stream);
+  //   const updateStreamStatus = () => {
+  //     setMicEnabled(stream.getAudioTracks()[0]?.enabled);
+  //     setVideoEnabled(stream.getVideoTracks()[0]?.enabled);
+  //   };
+  //   updateStreamStatus();
 
-    // Listen for changes in the stream:
-    stream.onaddtrack = (event) => {
-      console.log(event);
-      updateStreamStatus();
-    };
-    stream.onremovetrack = updateStreamStatus;
+  //   // Listen for changes in the stream:
+  //   stream.onaddtrack = (event) => {
+  //     console.log(event);
+  //     updateStreamStatus();
+  //   };
+  //   stream.onremovetrack = updateStreamStatus;
 
-    return () => {
-      stream.onaddtrack = null;
-      stream.onremovetrack = null;
-    };
-  }, [stream]);
+  //   return () => {
+  //     stream.onaddtrack = null;
+  //     stream.onremovetrack = null;
+  //   };
+  // }, [stream]);
 
   return (
     <div className="w-full h-full flex flex-col justify-center items-center border border-opacity-20 border-white rounded-lg relative p-4">

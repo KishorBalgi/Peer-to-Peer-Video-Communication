@@ -15,6 +15,7 @@ import Button from "@/components/Utils/Button";
 import { toggleVideoAudio } from "@/services/webRTC/init";
 import { leaveCallHandler } from "@/services/webRTC/peerConnection";
 import { IRootState } from "@/types/redux";
+import Settings from "./Settings";
 
 const ControlPanel = () => {
   const router = useRouter();
@@ -26,6 +27,7 @@ const ControlPanel = () => {
   const [mic, setMic] = useState(false);
   const [video, setVideo] = useState(false);
   const [screen, setScreen] = useState(false);
+  const [showSetting, setShowSetting] = useState(false);
 
   const handelMic = () => {
     if (!localStream) return;
@@ -66,13 +68,18 @@ const ControlPanel = () => {
           }`}
           onClick={handelScreen}
         /> */}
-        <Button buttonIcon={setting} buttonClassNames="py-4 m-0 !bg-gray-100" />
+        <Button
+          buttonIcon={setting}
+          buttonClassNames="py-4 m-0 !bg-gray-100"
+          onClick={() => setShowSetting(!showSetting)}
+        />
         <Button
           buttonIcon={end_call}
           buttonClassNames="py-4 m-0 !bg-red-500"
           onClick={() => leaveCallHandler(router)}
         />
       </div>
+      {showSetting && <Settings />}
     </div>
   );
 };

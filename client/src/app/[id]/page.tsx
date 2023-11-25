@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 
-import ControlPanel from "@/components/Call/ControlPanel";
+import ControlPanel from "@/components/Call/ControlPanel/ControlPanel";
 import SideControlPanel from "@/components/Call/SideControl/SideControlPanel";
 import VideoGrid from "@/components/Call/Participants Grid/VideoGrid";
 import Loading from "@/components/Utils/Loading";
