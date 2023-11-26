@@ -7,8 +7,8 @@ import mic_off from "@/assets/icons/mic-off.svg";
 import video_on from "@/assets/icons/video-on.svg";
 import video_off from "@/assets/icons/video-off.svg";
 import end_call from "@/assets/icons/end-call.svg";
-import screen_share from "@/assets/icons/screen-share.svg";
-import screen_share_off from "@/assets/icons/screen-share-off.svg";
+// import screen_share from "@/assets/icons/screen-share.svg";
+// import screen_share_off from "@/assets/icons/screen-share-off.svg";
 import setting from "@/assets/icons/setting.svg";
 
 import Button from "@/components/Utils/Button";
@@ -41,13 +41,12 @@ const ControlPanel = () => {
     setVideo(!video);
   };
 
-  const handelScreen = () => {
-    setScreen(!screen);
-  };
+  // const handelScreen = () => {
+  //   setScreen(!screen);
+  // };
 
   return (
     <div className="fixed bottom-2 left-1/2 -translate-x-1/2">
-      {/* TODO: Display time */}
       <div className="flex gap-2">
         <Button
           buttonIcon={mic ? mic_on : mic_off}
@@ -68,18 +67,20 @@ const ControlPanel = () => {
           }`}
           onClick={handelScreen}
         /> */}
-        <Button
-          buttonIcon={setting}
-          buttonClassNames="py-4 m-0 !bg-gray-100"
-          onClick={() => setShowSetting(!showSetting)}
-        />
+        <div>
+          <Button
+            buttonIcon={setting}
+            buttonClassNames="relative py-4 m-0 !bg-gray-100"
+            onClick={() => setShowSetting(!showSetting)}
+          />
+          {showSetting && <Settings />}
+        </div>
         <Button
           buttonIcon={end_call}
           buttonClassNames="py-4 m-0 !bg-red-500"
           onClick={() => leaveCallHandler(router)}
         />
       </div>
-      {showSetting && <Settings />}
     </div>
   );
 };

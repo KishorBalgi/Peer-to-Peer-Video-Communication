@@ -15,8 +15,10 @@ const Login = () => {
   const user = useSelector((state: IRootState) => state.user);
 
   useEffect(() => {
+    // If user is logged in, redirect to home page
     if (user.id != "") router.push("/");
   }, []);
+
   return (
     <main>
       <NavBar />

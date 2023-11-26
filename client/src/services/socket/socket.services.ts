@@ -4,6 +4,8 @@ import { store } from "@/redux/store";
 interface ISocketInstance extends Socket {
   callId?: string;
 }
+
+// Create socket instance:
 export const socket: ISocketInstance = io(
   process.env.NEXT_PUBLIC_SOCKET_URL as string,
   {

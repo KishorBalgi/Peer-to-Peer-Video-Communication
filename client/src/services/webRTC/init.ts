@@ -11,9 +11,9 @@ import { IStream } from "@/types/redux";
 import { receiveInCallMessage } from "../socket/chat.services";
 import { addMessage } from "@/redux/features/chat/chat.slice";
 
+// Initialize local stream:
 export const initLocalStream = async () => {
   try {
-    // const localStream = new MediaStream();
     const localStream = await navigator.mediaDevices.getUserMedia({
       video: true,
       audio: true,
@@ -23,7 +23,9 @@ export const initLocalStream = async () => {
     localStream.getVideoTracks()[0].enabled = false;
     localStream.getAudioTracks()[0].enabled = false;
 
+    // Add local stream to peerStore:
     addPeer(socket.id, { stream: localStream, connection: null });
+    // Add local stream to redux store:
     store.dispatch(
       addLocalStream({
         peerId: socket.id,
@@ -33,6 +35,8 @@ export const initLocalStream = async () => {
         },
       })
     );
+
+    // Mount socket events:
 
     // New user joined the call:
     newUserJoinedCall();
@@ -58,9 +62,9 @@ export const toggleVideoAudio = async (
   toggle: "video" | "audio"
 ) => {
   const peer = getPeer(streamData.peerId);
+  const stream = peer?.stream;
   const peerConnection = peer?.connection;
-  const stream = getPeer(streamData.peerId)?.stream;
-  // const stream = getPeer(streamData.peerId)?.stream;
+
   if (!stream) return console.log("Stream not found");
 
   // For video:

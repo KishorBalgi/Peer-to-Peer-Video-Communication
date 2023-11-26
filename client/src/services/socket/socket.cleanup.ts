@@ -5,6 +5,7 @@ import socketEvents from "@/configs/socket.json";
 export const removeCallListeners = () => {
   socket.callId = undefined;
 
+  // Remove all listeners:
   socket.off(socketEvents.USER_JOINED);
   socket.off(socketEvents.USER_LEFT);
   socket.off(socketEvents.SIGNAL_MSG);

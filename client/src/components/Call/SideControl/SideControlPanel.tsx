@@ -38,7 +38,6 @@ const SideControlPanel = () => {
 
   return (
     <div className="flex items-center mr-3">
-      {/* TODO: Display time */}
       <div className="flex flex-col gap-2 w-max">
         <Button
           buttonIcon={chat}

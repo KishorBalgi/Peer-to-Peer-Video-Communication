@@ -1,21 +1,24 @@
 import { useRouter } from "next/navigation";
 import { toastLoading, toastUpdate } from "@/components/Notifications/toasts";
 
-import { socket } from "./socket.services";
-import socketEvents from "@/configs/socket.json";
 import { initLocalStream } from "@/services/webRTC/init";
 import {
   handleSignallingMessage,
-  leaveCallHandler,
+  createOffer,
+  userLeftCallHandler,
 } from "../webRTC/peerConnection";
-import { createOffer, userLeftCallHandler } from "../webRTC/peerConnection";
+
+import { socket } from "./socket.services";
+import socketEvents from "@/configs/socket.json";
 import { TCallbackResponse, TUserJoined } from "@/types/socket";
 import { TSignallingMessage } from "@/types/socket";
 
 // Initiate a new call:
 export const initNewCall = (navigate: ReturnType<typeof useRouter>) => {
-  if (!socket) return; //🚩 !socket
+  if (!socket) return;
   const loadingToastId = toastLoading("Starting a new call...");
+
+  // Emit start new call event:
   socket.emit(
     socketEvents.START_NEW_CALL,
     { userSocketId: socket.id },
@@ -34,10 +37,11 @@ export const joinExistingCall = (
   callId: string,
   navigate: ReturnType<typeof useRouter>
 ) => {
-  if (!socket) return; //🚩 !socket
+  if (!socket) return;
 
   const loadingToastId = toastLoading("Joining call...");
 
+  // Check if the call exists:
   socket.emit(
     socketEvents.CHECK_CALL_EXISTS,
     callId,
@@ -46,7 +50,7 @@ export const joinExistingCall = (
         toastUpdate(loadingToastId, "error", res.message, false);
         return navigate.push("/");
       }
-      // Init local stream:
+      // If call exist, Init local stream:
       await initLocalStream();
 
       // Join call:
@@ -72,6 +76,7 @@ export const joinExistingCall = (
 // New user joined the call:
 export const newUserJoinedCall = () => {
   socket.on(socketEvents.USER_JOINED, (data: TUserJoined) => {
+    // Create offer for the new user:
     createOffer(data);
   });
 };
@@ -93,7 +98,7 @@ export const userLeftCall = () => {
 
 // Send signalling message:
 export const sendSignallingMessage = (message: TSignallingMessage) => {
-  if (!socket) return; //🚩 !socket
+  if (!socket) return;
   socket.emit(socketEvents.SIGNAL_MSG, message);
 };
 

@@ -21,6 +21,7 @@ process.on("uncaughtException", (err: any) => {
 const port = process.env.PORT || 3000;
 
 httpServer.listen(port, () => {
+  console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
   console.log(`Server running on Port: ${port} http://localhost:${port}`);
 });
 

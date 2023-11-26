@@ -22,6 +22,9 @@ const ParticipantsPanel = ({ close }: { close: () => void }) => {
       </div>
       <hr className=" border-solid border-black" />
       <div className="px-2 h-full overflow-y-scroll">
+        {participants.length === 0 && (
+          <p className="text-center text-gray-500 my-5">No participants</p>
+        )}
         {participants.map((participant, index) => (
           <div key={index} className="flex items-center gap-2 my-2 p-2">
             <div className="w-10 h-10 rounded-full bg-gray-200 flex justify-center items-center">
