@@ -1,24 +1,19 @@
 import { Server, Socket } from "socket.io";
-import AppError from "../utils/appError";
 import { v4 as uuidv4 } from "uuid";
 import socketEvents from "../configs/socket.json";
 import {
   TCallbackResponse,
   TJoinCall,
+  TNewCall,
   TCreateCall,
   TSignallingMessage,
   TChatMessage,
   TLeaveCall,
-} from "../types/socketInterfaces";
+} from "../types/socket.types";
 import { createCall, getCallById } from "../services/call.services";
 
-// Generate a unique call id with uuidv4() of length 10:
-interface INewCall {
-  callId: string;
-  userId: string;
-  createdAt: Date;
-}
-const createNewCall = async (userId: string): Promise<INewCall> => {
+const createNewCall = async (userId: string): Promise<TNewCall> => {
+  // Generate a unique call id with uuidv4() of length 10:
   const callId = uuidv4().replace(/-/g, "").slice(0, 10);
 
   //   1. check if the call id already exists in the database:
@@ -34,7 +29,6 @@ const createNewCall = async (userId: string): Promise<INewCall> => {
     userId,
   });
 
-  // return callId;
   return newCall;
 };
 
@@ -46,7 +40,7 @@ export const mountStartNewCallEvent = (socket: Socket) => {
       const userId = socket.data.user.id;
       // Creata a new call:
       const callDetails = await createNewCall(userId);
-      console.log("callDetails", callDetails);
+
       // Send the call details to the client:
       callback(
         socketResponse({
@@ -64,7 +58,10 @@ export const mountCheckCallExistsEvent = (socket: Socket) => {
   socket.on(
     socketEvents.CHECK_CALL_EXISTS,
     async (data: string, callback: (res: TCallbackResponse) => void) => {
+      // Check if the call exists in the database:
       const call = await getCallById(data);
+
+      // If the call does not exist, then send an error:
       if (!call) {
         return callback(
           socketResponse({
@@ -74,6 +71,8 @@ export const mountCheckCallExistsEvent = (socket: Socket) => {
           })
         );
       }
+
+      // If the call exists, then send the call details to the client:
       callback(
         socketResponse({
           status: "success",
@@ -90,7 +89,7 @@ export const mountJoinCallEvent = (socket: Socket) => {
   socket.on(
     socketEvents.JOIN_CALL,
     async (data: TJoinCall, callback: (res: TCallbackResponse) => void) => {
-      // 🚩 Check if the call exists in db:
+      // Check if the call exists in db:
       const call = await getCallById(data.callId);
 
       // If the call does not exist, then send an error:
@@ -104,20 +103,26 @@ export const mountJoinCallEvent = (socket: Socket) => {
         );
       }
 
-      // If the call exists, then join the call:
+      // Add the user to the data:
       data.user = {
         id: socket.data.user.id,
         name: socket.data.user.name,
       };
+
+      // If the call exists, then join the call:
       socket.join(data.callId);
+
       console.log(
         `User ${data.user.id} : ${data.user.name} joined call ${data.callId}`
       );
+
+      // Send the user details to the other users in the room:
       socket.to(data.callId).emit(socketEvents.USER_JOINED, {
         userSocketId: data.userSocketId,
         user: data.user,
       });
 
+      // Send the call details to the client:
       callback(
         socketResponse({
           status: "success",
@@ -132,8 +137,10 @@ export const mountJoinCallEvent = (socket: Socket) => {
 // Leave a call event:
 export const mountLeaveCallEvent = (socket: Socket) => {
   socket.on(socketEvents.LEAVE_CALL, (data: TLeaveCall) => {
+    // Leave the call:
     socket.leave(data.callId);
     console.log(`User ${data.userSocketId} left call ${data.callId}`);
+    // Send user left message to the other users in the room:
     socket.to(data.callId).emit(socketEvents.USER_LEFT, data.userSocketId);
   });
 };
@@ -141,6 +148,7 @@ export const mountLeaveCallEvent = (socket: Socket) => {
 // Signalling message event:
 export const mountSignallingMessageEvent = (socket: Socket) => {
   socket.on(socketEvents.SIGNAL_MSG, (data: TSignallingMessage) => {
+    // Send the message to the user in the room excluding the sender:
     socket.to(data.to).emit(socketEvents.SIGNAL_MSG, data);
   });
 };
@@ -153,15 +161,7 @@ export const mountSendInCallMessageEvent = (io: Server, socket: Socket) => {
   });
 };
 
-// Test Message:🚩
-export const mountTestMessageEvent = (socket: Socket) => {
-  socket.on("test", (data: any) => {
-    console.log("Test message: ", data);
-
-    socket.to(data.to).emit("test", { ...data, from: socket.id });
-  });
-};
-
+// Socket response:
 const socketResponse = ({ status, message, data }: TCallbackResponse) => {
   return {
     status,

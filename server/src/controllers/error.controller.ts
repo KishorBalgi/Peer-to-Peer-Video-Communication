@@ -10,6 +10,7 @@ const sendErrDev = (err: AppError, res: Response) => {
     stackTrace: err.stack,
   });
 };
+
 // Prod Error:
 const sendErrProd = (err: AppError, res: Response) => {
   if (err.isOperational) {
@@ -26,6 +27,8 @@ const sendErrProd = (err: AppError, res: Response) => {
     });
   }
 };
+
+// Global Error Handler:
 export const globalErrorHandler = (
   err: AppError,
   req: Request,
