@@ -1,5 +1,6 @@
 import { getAllCalls, deleteCallById } from "../services/call.services";
 
+// Remove older calls node-cron job:
 export const removeOlderCalls = async () => {
   console.log("Cron job: Removing older calls");
   const calls = await getAllCalls();

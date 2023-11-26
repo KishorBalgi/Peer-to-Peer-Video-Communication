@@ -1,16 +1,18 @@
 import express from "express";
 import { createServer } from "node:http";
 import { Server } from "socket.io";
-import cookieParser from "cookie-parser";
+import hpp from "hpp";
 import cors from "cors";
 import helmet from "helmet";
-import { rateLimit } from "express-rate-limit";
-import hpp from "hpp";
 import compression from "compression";
+import cookieParser from "cookie-parser";
+import { rateLimit } from "express-rate-limit";
 
 import AppError from "./utils/appError";
-import { globalErrorHandler } from "./controllers/error.controller";
+import { JwtPayload } from "jsonwebtoken";
+import { verifyJWT } from "./utils/jwt.utils";
 import { initiateSocket } from "./socket/socketConfig";
+import { globalErrorHandler } from "./controllers/error.controller";
 import environment from "./configs/environment.json";
 import { getUser } from "./services/user.services";
 
@@ -19,9 +21,7 @@ import authRoutes from "./routes/auth.routes";
 import {
   ServerToClientEvents,
   ClientToServerEvents,
-} from "./types/socketInterfaces";
-import { JwtPayload } from "jsonwebtoken";
-import { verifyJWT } from "./utils/jwt.utils";
+} from "./types/socket.types";
 
 // Express setup:
 const app = express();
@@ -70,6 +70,11 @@ app.use("/api/v1/auth", authRoutes);
 
 app.get("/", (req, res, next) => {
   res.send("<h1>This is the server for peer to peer video communication</h1>");
+});
+
+// 404 error handler:
+app.all("*", (req, res, next) => {
+  next(new AppError(404, `Can't find ${req.originalUrl} on this server!`));
 });
 
 // Socket setup:

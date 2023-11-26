@@ -4,7 +4,6 @@ import {
   mountJoinCallEvent,
   mountStartNewCallEvent,
   mountSignallingMessageEvent,
-  mountTestMessageEvent,
   mountSendInCallMessageEvent,
   mountLeaveCallEvent,
   mountCheckCallExistsEvent,
@@ -25,7 +24,6 @@ const initiateSocket = (io: Server) => {
       mountStartNewCallEvent(socket);
       mountSignallingMessageEvent(socket);
       mountSendInCallMessageEvent(io, socket);
-      mountTestMessageEvent(socket);
       mountLeaveCallEvent(socket);
 
       // Handle socket disconnection:

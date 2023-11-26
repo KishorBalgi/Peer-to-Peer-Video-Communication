@@ -3,7 +3,6 @@ import React, { useRef, useEffect } from "react";
 import VideoContainer from "./VideoContainer";
 import { useSelector } from "react-redux";
 import { IRootState, IStream } from "@/types/redux";
-import { socket } from "@/services/socket/socket.services";
 
 const VideoGrid = () => {
   const gridRef = useRef(null);
@@ -15,6 +14,7 @@ const VideoGrid = () => {
   );
 
   useEffect(() => {
+    // Grid layout manipulation:
     if (gridRef.current === null) return;
 
     const gridElement = gridRef.current as HTMLDivElement;

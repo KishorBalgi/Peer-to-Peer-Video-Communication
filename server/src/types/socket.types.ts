@@ -5,6 +5,13 @@ export type TCallbackResponse = {
   data: any;
 };
 
+// New call:
+export interface TNewCall {
+  callId: string;
+  userId: string;
+  createdAt: Date;
+}
+
 // Join Call:
 export type TJoinCall = {
   callId: string;
@@ -44,6 +51,7 @@ export type TSignallingMessage = {
   data: RTCSessionDescriptionInit | RTCIceCandidateInit;
 };
 
+// Server to client events:
 export interface ServerToClientEvents {
   user_joined: (id: string) => void;
   signal_msg: (data: TSignallingMessage) => void;
@@ -51,6 +59,7 @@ export interface ServerToClientEvents {
   user_left: (id: string) => void;
 }
 
+// Client to server events:
 export interface ClientToServerEvents {
   start_new_call: (
     data: TCreateCall,

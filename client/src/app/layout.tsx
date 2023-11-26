@@ -31,6 +31,7 @@ export default function RootLayout({
           hideProgressBar
           newestOnTop
           closeOnClick
+          closeButton={false}
           rtl={false}
           pauseOnFocusLoss={false}
           draggable

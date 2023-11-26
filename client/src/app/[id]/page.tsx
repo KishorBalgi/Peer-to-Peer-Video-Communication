@@ -8,9 +8,10 @@ import SideControlPanel from "@/components/Call/SideControl/SideControlPanel";
 import VideoGrid from "@/components/Call/Participants Grid/VideoGrid";
 import Loading from "@/components/Utils/Loading";
 
+import { isAuthenticated } from "@/services/auth.services";
 import { joinExistingCall } from "@/services/socket/call.services";
-import { IRootState } from "@/types/redux";
 import { leaveCallHandler } from "@/services/webRTC/peerConnection";
+import { IRootState } from "@/types/redux";
 
 const CallPage = ({ params }: { params: { id: string } }) => {
   const router = useRouter();
@@ -20,12 +21,23 @@ const CallPage = ({ params }: { params: { id: string } }) => {
   );
 
   useEffect(() => {
-    if (!user || user.id == "") return router.push("/auth/login");
-    else joinExistingCall(params.id, router);
+    const checkAuth = async () => {
+      const auth = await isAuthenticated();
 
-    window.addEventListener("beforeunload", () => {
-      leaveCallHandler(router);
-    });
+      if (auth.status === "error") {
+        // If user is not logged in, redirect to login page
+        if (!user || user.id == "") return router.push("/auth/login");
+      }
+
+      // Join the call:
+      joinExistingCall(params.id, router);
+
+      // Leave the call when the user closes the tab
+      window.addEventListener("beforeunload", () => {
+        leaveCallHandler(router);
+      });
+    };
+    checkAuth();
 
     return () => {
       window.removeEventListener("beforeunload", () => {});

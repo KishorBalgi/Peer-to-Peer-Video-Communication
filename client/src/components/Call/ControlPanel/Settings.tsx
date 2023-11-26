@@ -3,7 +3,7 @@ import { socket } from "@/services/socket/socket.services";
 import { getPeer } from "@/redux/features/call/peerStore";
 import { updateTracks } from "@/services/webRTC/peerConnection";
 
-const Settings: React.FC = () => {
+const Settings = () => {
   const [videoDevices, setVideoDevices] = useState<MediaDeviceInfo[]>([]);
   const [audioDevices, setAudioDevices] = useState<MediaDeviceInfo[]>([]);
   const [selectedVideoDevice, setSelectedVideoDevice] = useState<string>("");
@@ -12,8 +12,10 @@ const Settings: React.FC = () => {
   useEffect(() => {
     const getMediaDevices = async () => {
       try {
+        // Get the current stream:
         const stream = getPeer(socket.id)?.stream;
 
+        // Get all the devices:
         const devices = await navigator.mediaDevices.enumerateDevices();
         const videoDevices = devices.filter(
           (device) => device.kind === "videoinput"
@@ -48,7 +50,7 @@ const Settings: React.FC = () => {
   ) => {
     const newSelectedVideoDevice = event.target.value;
     setSelectedVideoDevice(newSelectedVideoDevice);
-    console.log("selected video device:", newSelectedVideoDevice);
+
     const stream = getPeer(socket.id)?.stream;
 
     if (!stream) return;
@@ -58,9 +60,6 @@ const Settings: React.FC = () => {
       video: { deviceId: newSelectedVideoDevice },
     };
 
-    console.log("constraints:", constraints);
-    console.log("current video track:", selectedVideoDevice);
-
     const newStream = await navigator.mediaDevices.getUserMedia(constraints);
     const newVideoTrack = newStream.getVideoTracks()[0];
     newVideoTrack.enabled = currentVideoTrack.enabled;
@@ -69,6 +68,7 @@ const Settings: React.FC = () => {
     stream.removeTrack(currentVideoTrack);
     currentVideoTrack.stop();
 
+    // Update the tracks for all the peers:
     updateTracks(stream);
   };
 
@@ -77,7 +77,7 @@ const Settings: React.FC = () => {
   ) => {
     const newSelectedAudioDevice = event.target.value;
     setSelectedAudioDevice(newSelectedAudioDevice);
-    console.log("selected audio device:", newSelectedAudioDevice);
+
     const stream = getPeer(socket.id)?.stream;
 
     if (!stream) return;
@@ -87,19 +87,20 @@ const Settings: React.FC = () => {
       audio: { deviceId: newSelectedAudioDevice },
     };
 
-    console.log("constraints:", constraints);
-    console.log("current audio track:", selectedAudioDevice);
-
     const newStream = await navigator.mediaDevices.getUserMedia(constraints);
     const newAudioTrack = newStream.getAudioTracks()[0];
     newAudioTrack.enabled = currentAudioTrack.enabled;
+
     stream.addTrack(newAudioTrack);
     stream.removeTrack(currentAudioTrack);
     currentAudioTrack.stop();
+
+    // Update the tracks for all the peers:
+    updateTracks(stream);
   };
 
   return (
-    <div className="absolute flex flex-col gap-2 bg-white bottom-20 rounded-lg text-black p-2">
+    <div className="absolute flex flex-col gap-2 bg-white w-full left-36 bottom-20 rounded-lg text-black p-2">
       <div className="my-2">
         <label>Video Devices:</label>
 

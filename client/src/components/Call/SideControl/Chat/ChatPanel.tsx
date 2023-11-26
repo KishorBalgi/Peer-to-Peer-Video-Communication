@@ -32,6 +32,9 @@ const ChatPanel = ({ close }: { close: () => void }) => {
       </div>
       <hr className="border-solid border-black" />
       <div className="px-2 h-full overflow-y-scroll">
+        {chats.length === 0 && (
+          <p className="text-center text-gray-500 my-5">No chats</p>
+        )}
         {chats.map((chat, index) => (
           <Chat key={index} chat={chat} />
         ))}

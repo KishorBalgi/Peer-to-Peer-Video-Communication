@@ -1,5 +1,6 @@
 import { Response } from "express";
 
+// Util used to send response:
 export const sendResponse = (res: Response, statusCode: number, data: any) => {
   // Set status:
   let status = "success";

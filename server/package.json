@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node dist/src/index.js",
+    "start": "set NODE_ENV=production && node dist/src/index.js",
     "dev": "npx nodemon",
     "build": "rimraf ./dist && npx tsc"
   },

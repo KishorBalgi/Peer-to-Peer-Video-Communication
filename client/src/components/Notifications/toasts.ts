@@ -11,6 +11,7 @@ const toastOptions: ToastOptions = {
   theme: "dark",
 };
 
+// Toast messages:
 export const toastMessage = ({
   type,
   message,
@@ -21,10 +22,12 @@ export const toastMessage = ({
   toast[type](message, toastOptions);
 };
 
+// Toast loading:
 export const toastLoading = (message: string): Id => {
   return toast.loading(message, toastOptions);
 };
 
+// Toast update:
 export const toastUpdate = (
   id: Id,
   type: TypeOptions,
