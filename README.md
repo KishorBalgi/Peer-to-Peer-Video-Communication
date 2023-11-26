@@ -177,7 +177,7 @@ Don't forget to give the project a star! Thanks again!
 
 ## License
 
-Distributed under the GNU License. See `[LICENSE](https://github.com/KishorBalgi/Peer-to-Peer-Video-Communication/blob/main/LICENSE)` for more information.
+Distributed under the GNU License. See [`LICENSE`](https://github.com/KishorBalgi/Peer-to-Peer-Video-Communication/blob/main/LICENSE) for more information.
 
 <!-- CONTACT -->
 
