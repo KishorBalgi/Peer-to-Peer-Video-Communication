@@ -70,7 +70,7 @@ export const login = async (data: FormData): Promise<IFormCallbackResponse> => {
     console.log(err);
     return {
       status: "error",
-      message: "Something went wrong",
+      message: err.response?.data.message,
     };
   }
 };

@@ -12,7 +12,7 @@ import end_call from "@/assets/icons/end-call.svg";
 import setting from "@/assets/icons/setting.svg";
 
 import Button from "@/components/Utils/Button";
-import { toggleVideoAudio } from "@/services/webRTC/init";
+import { initLocalStream, toggleVideoAudio } from "@/services/webRTC/init";
 import { leaveCallHandler } from "@/services/webRTC/peerConnection";
 import { IRootState } from "@/types/redux";
 import Settings from "./Settings";
@@ -29,15 +29,15 @@ const ControlPanel = () => {
   const [screen, setScreen] = useState(false);
   const [showSetting, setShowSetting] = useState(false);
 
-  const handelMic = () => {
-    if (!localStream) return;
-    toggleVideoAudio(localStream, "audio");
+  const handelMic = async () => {
+    if (!localStream) await initLocalStream();
+    if (localStream) toggleVideoAudio(localStream, "audio");
     setMic(!mic);
   };
 
-  const handelVideo = () => {
-    if (!localStream) return;
-    toggleVideoAudio(localStream, "video");
+  const handelVideo = async () => {
+    if (!localStream) await initLocalStream();
+    if (localStream) toggleVideoAudio(localStream, "video");
     setVideo(!video);
   };
 
