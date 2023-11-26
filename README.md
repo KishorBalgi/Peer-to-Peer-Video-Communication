@@ -1,8 +1,11 @@
 <!-- PROJECT LOGO -->
+
+<a href="#readme-top"></a>
 <br />
+
 <div align="center">
   <a href="https://p-to-p-video-client.onrender.com/">
-    <img src="https://github.com/KishorBalgi/ping-websites/assets/75678927/94cfe145-ebc1-4268-9647-0e6f978fb5d8" alt="Logo" width="200" height="200">
+    <img src="https://github.com/KishorBalgi/Peer-to-Peer-Video-Communication/assets/75678927/4867b00c-4dc6-4a52-ae05-6d994a875528" alt="Logo" width="200" height="200">
   </a>
 
   <h3 align="center">Peer To Peer Video Communication</h3>
@@ -28,7 +31,7 @@
       </ul>
     </li>
     <li><a href="#installation">Installation</a></li>
-    <li><a href="#usage">Usage</a></li>
+    <li><a href="#demonstration">Demonstration</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
@@ -40,21 +43,35 @@
 
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+**Home Page**
+<img src="https://github.com/KishorBalgi/Peer-to-Peer-Video-Communication/assets/75678927/c807f5ba-4ee1-4b36-b21e-80ecc2466b31" alt="Home Page">
+
+**Signup Page**
+<img src="https://github.com/KishorBalgi/Peer-to-Peer-Video-Communication/assets/75678927/66548df0-6693-4777-8610-0260d78fd5be" alt="Signup Page">
+
+**Login Page**
+<img src="https://github.com/KishorBalgi/Peer-to-Peer-Video-Communication/assets/75678927/a3e41581-da73-4ef7-8b48-0cdc7048d485" alt="Login Page">
+
+**Video Call**
+<img src="https://github.com/KishorBalgi/Peer-to-Peer-Video-Communication/assets/75678927/da03fd6d-dda1-4208-a23f-2ac553d60dc4" alt="Video Call">
+
+<img src="https://github.com/KishorBalgi/Peer-to-Peer-Video-Communication/assets/75678927/75f1af97-2296-4881-ac5f-ed0cde897b17" alt="Chats">
+
+<img src="https://github.com/KishorBalgi/Peer-to-Peer-Video-Communication/assets/75678927/2cfaeec4-001c-4cf9-9192-a83e547da10f" alt="Participants">
 
 A peer-to-peer video calling application built using webRTC. The project supports multi-user video calling with in-call real-time messaging.
 
 #### Key Features
 
-- Multi-User Video Calling: Engage in video calls with multiple participants simultaneously.
+- **Multi-User Video Calling:** Engage in video calls with multiple participants simultaneously.
 
-- Real-Time Messaging: Stay connected during calls with in-call real-time messaging, enhancing the overall user experience.
+- **Real-Time Messaging:** Stay connected during calls with in-call real-time messaging, enhancing the overall user experience.
 
 #### Architecture
 
-- Signalling Server: The client utilizes a Socket.io-powered signalling server to facilitate call initiation and in-call messaging.
+- **Signalling Server:** The client utilizes a Socket.io-powered signalling server to facilitate call initiation and in-call messaging.
 
-- Data Persistence: All user and call records are securely stored in PostgreSQL, managed by the Prisma ORM.
+- **Data Persistence:** All user and call records are securely stored in PostgreSQL, managed by the Prisma ORM.
 
 #### Project Goal
 
@@ -64,18 +81,18 @@ This project serves as an exploration of WebRTC technology, pushing the boundari
 
 #### Front-End:
 
-- [![Next][Next.js]][Next-url]
-- [![Redux][Redux]][Redux-url]
-- [![WebRTC][webrtc]][webrtc-url]
-- [![Tailwind][tailwind]][tailwind-url]
+[![Next][Next.js]][Next-url]
+[![Redux][Redux]][Redux-url]
+[![WebRTC][webrtc]][webrtc-url]
+[![Tailwind][tailwind]][tailwind-url]
 
 #### Back-End:
 
-- [![TypeScript][TS]][TS-url]
-- [![Express][Express]][Express-url]
-- [![Socket.io][Socket]][Socket-url]
-- [![PostgreSQL][Postgre]][Postgre-url]
-- [![Prisma ORM][prisma]][prisma-url]
+[![TypeScript][TS]][TS-url]
+[![Express][Express]][Express-url]
+[![Socket.io][Socket]][Socket-url]
+[![PostgreSQL][Postgre]][Postgre-url]
+[![Prisma ORM][prisma]][prisma-url]
 
 <!-- GETTING STARTED -->
 
@@ -160,7 +177,7 @@ Don't forget to give the project a star! Thanks again!
 
 ## License
 
-Distributed under the MIT License. See `LICENSE.txt` for more information.
+Distributed under the GNU License. See `[LICENSE](https://github.com/KishorBalgi/Peer-to-Peer-Video-Communication/blob/main/LICENSE)` for more information.
 
 <!-- CONTACT -->
 
@@ -169,13 +186,10 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 [![Linkedin][lnk]][lnk-url]
 [![Twitter][twitter]][twitter-url]
 
-Project Link: [https://github.com/KishorBalgi/Peer-to-Peer-Video-Communication](https://github.com/KishorBalgi/Peer-to-Peer-Video-Communication)
-
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- MARKDOWN LINKS & IMAGES -->
 
-[product-screenshot]: images/screenshot.png
 [Next.js]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
 [Next-url]: https://nextjs.org/
 [Redux]: https://img.shields.io/badge/Redux-593D88?style=for-the-badge&logo=redux&logoColor=white
