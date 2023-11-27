@@ -43,6 +43,8 @@
 
 ## About The Project
 
+A peer-to-peer video calling application built using webRTC. The project supports multi-user video calling with in-call real-time messaging.
+
 **Home Page**
 <img src="https://github.com/KishorBalgi/Peer-to-Peer-Video-Communication/assets/75678927/c807f5ba-4ee1-4b36-b21e-80ecc2466b31" alt="Home Page">
 
@@ -58,8 +60,6 @@
 <img src="https://github.com/KishorBalgi/Peer-to-Peer-Video-Communication/assets/75678927/75f1af97-2296-4881-ac5f-ed0cde897b17" alt="Chats">
 
 <img src="https://github.com/KishorBalgi/Peer-to-Peer-Video-Communication/assets/75678927/2cfaeec4-001c-4cf9-9192-a83e547da10f" alt="Participants">
-
-A peer-to-peer video calling application built using webRTC. The project supports multi-user video calling with in-call real-time messaging.
 
 #### Key Features
 
@@ -157,6 +157,8 @@ This project serves as an exploration of WebRTC technology, pushing the boundari
     <!-- Demonstration -->
 
 ## Demonstration
+
+https://github.com/KishorBalgi/Peer-to-Peer-Video-Communication/assets/75678927/4fcf54da-0bb0-4dbf-b5b0-bbc7552f25fc
 
 <!-- CONTRIBUTING -->
 
