@@ -8,21 +8,24 @@ import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
 import { IRootState } from "@/types/redux";
+import NavBar from "@/components/Layout/NavBar";
 
 const Signup = () => {
   const router = useRouter();
   const user = useSelector((state: IRootState) => state.user);
 
   useEffect(() => {
+    // If user is logged in, redirect to home page
     if (user.id != "") router.push("/");
   }, []);
   return (
     <main>
-      <div className="grid grid-cols-2 w-full h-[100vh]  place-items-center">
+      <NavBar />
+      <div className="grid grid-cols-2 max-lg:grid-cols-1 w-full h-[100vh]  place-items-center">
         <div className="col-span-1">
           <Image src={hero} alt="hero" className=" w-3/5 h-auto mx-auto" />
         </div>
-        <div className="col-span-1">
+        <div className="col-span-1 mx-4">
           <div className="flex flex-col gap-2">
             <h1 className=" text-6xl font-bold">Video Chat</h1>
             <p className="text-xl font-semibold">

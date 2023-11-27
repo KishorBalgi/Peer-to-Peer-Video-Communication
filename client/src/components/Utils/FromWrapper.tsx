@@ -32,16 +32,20 @@ const FormWrapper = ({
   return (
     <form
       ref={formRef}
+      // Submit handler:
       action={(props) => {
         let toastId: number | string;
         if (formRef.current?.classList.contains("type-1")) {
           toastId = toastLoading("Loading...");
         }
+
+        
         startTransition(async () => {
           const res = await callback(props);
 
           if (res.status === "success") {
             toastUpdate(toastId, "success", res.message as string, false);
+            formRef.current?.reset();
             if (res.redirect) {
               router?.push(res.redirect);
             }

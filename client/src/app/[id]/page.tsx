@@ -3,28 +3,51 @@ import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 
-import ControlPanel from "@/components/Call/ControlPanel";
+import ControlPanel from "@/components/Call/ControlPanel/ControlPanel";
 import SideControlPanel from "@/components/Call/SideControl/SideControlPanel";
 import VideoGrid from "@/components/Call/Participants Grid/VideoGrid";
+import Loading from "@/components/Utils/Loading";
 
+import { isAuthenticated } from "@/services/auth.services";
 import { joinExistingCall } from "@/services/socket/call.services";
+import { leaveCallHandler } from "@/services/webRTC/peerConnection";
 import { IRootState } from "@/types/redux";
 
 const CallPage = ({ params }: { params: { id: string } }) => {
   const router = useRouter();
   const user = useSelector((state: IRootState) => state.user);
+  const localStream = useSelector(
+    (state: IRootState) => state.call.localStream
+  );
 
   useEffect(() => {
-    if (!user || user.id == "") return router.push("/auth/login");
-    else joinExistingCall(params.id, router);
+    const checkAuth = async () => {
+      const auth = await isAuthenticated();
+
+      if (auth.status === "error") {
+        // If user is not logged in, redirect to login page
+        if (!user || user.id == "") return router.push("/auth/login");
+      }
+
+      // Join the call:
+      joinExistingCall(params.id, router);
+
+      // Leave the call when the user closes the tab
+      window.addEventListener("beforeunload", () => {
+        leaveCallHandler(router);
+      });
+    };
+    checkAuth();
+
+    return () => {
+      window.removeEventListener("beforeunload", () => {});
+    };
   }, []);
 
   return (
-    <div>
+    <>
       {user && user.id == "" ? (
-        <div className="w-full h-full flex justify-center items-center">
-          <h1 className="text-2xl text-white my-5">Loading...</h1>
-        </div>
+        <Loading />
       ) : (
         <>
           <div className="flex justify-between items-center w-[100vw]">
@@ -34,7 +57,7 @@ const CallPage = ({ params }: { params: { id: string } }) => {
           <ControlPanel />
         </>
       )}
-    </div>
+    </>
   );
 };
 

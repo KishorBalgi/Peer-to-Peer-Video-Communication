@@ -25,7 +25,8 @@ export const signup = async (
         createdAt: data.createdAt,
         token: res.data.jwttoken,
       };
-      localStorage.setItem("jwt", res.data.jwttoken);
+
+      // Set user in redux store:
       store.dispatch(addUser(user));
       return {
         status: res.data.status,
@@ -59,8 +60,8 @@ export const login = async (data: FormData): Promise<IFormCallbackResponse> => {
         createdAt: data.createdAt,
         token: res.data.jwttoken,
       };
-      console.log(res.data);
-      localStorage.setItem("jwt", res.data.jwttoken);
+
+      // Set user in redux store:
       store.dispatch(addUser(user));
       return { status: res.data.status, message: "Logged In", redirect: "/" };
     }
@@ -69,7 +70,7 @@ export const login = async (data: FormData): Promise<IFormCallbackResponse> => {
     console.log(err);
     return {
       status: "error",
-      message: "Something went wrong",
+      message: err.response?.data.message,
     };
   }
 };
@@ -87,6 +88,8 @@ export const isAuthenticated = async (): Promise<IFormCallbackResponse> => {
         createdAt: data.createdAt,
         token: res.data.jwttoken,
       };
+
+      // Set user in redux store:
       store.dispatch(addUser(user));
     }
     return { status: res.data.status, message: "Authenticated" };
@@ -105,7 +108,6 @@ export const logout = async (): Promise<IFormCallbackResponse> => {
     if (res.data.status === "success") {
       store.dispatch(removeUser());
     }
-    localStorage.setItem("jwt", "");
     return { status: "success", message: "Logged Out", redirect: "/" };
   } catch (err: any) {
     return {

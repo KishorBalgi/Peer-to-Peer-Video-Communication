@@ -1,52 +1,74 @@
 import { useRouter } from "next/navigation";
 import { toastLoading, toastUpdate } from "@/components/Notifications/toasts";
 
+import { initLocalStream } from "@/services/webRTC/init";
+import {
+  handleSignallingMessage,
+  createOffer,
+  userLeftCallHandler,
+} from "../webRTC/peerConnection";
+
 import { socket } from "./socket.services";
 import socketEvents from "@/configs/socket.json";
-import { initLocalStream } from "@/services/webRTC/init";
-import { handleSignallingMessage } from "../webRTC/peerConnection";
-import { createOffer, userLeftCallHandler } from "../webRTC/peerConnection";
 import { TCallbackResponse, TUserJoined } from "@/types/socket";
 import { TSignallingMessage } from "@/types/socket";
 
 // Initiate a new call:
 export const initNewCall = (navigate: ReturnType<typeof useRouter>) => {
-  if (!socket) return; //🚩 !socket
+  if (!socket) return;
   const loadingToastId = toastLoading("Starting a new call...");
+
+  // Emit start new call event:
   socket.emit(
     socketEvents.START_NEW_CALL,
     { userSocketId: socket.id },
     (res: TCallbackResponse) => {
-      toastUpdate(loadingToastId, "success", "Call started!", false);
-      navigate.push(`/${res.data.callId}`);
+      if (res.status === "success") {
+        toastUpdate(loadingToastId, "success", "Call started!", false);
+        return navigate.push(`/${res.data.callId}`);
+      }
+      toastUpdate(loadingToastId, "error", res.message, false);
     }
   );
 };
 
 // Join an existing call:
-export const joinExistingCall = async (
+export const joinExistingCall = (
   callId: string,
   navigate: ReturnType<typeof useRouter>
 ) => {
-  if (!socket) return; //🚩 !socket
+  if (!socket) return;
 
   const loadingToastId = toastLoading("Joining call...");
-  // Init local stream:
-  await initLocalStream();
 
+  // Check if the call exists:
   socket.emit(
-    socketEvents.JOIN_CALL,
-    {
-      callId,
-      userSocketId: socket.id,
-    },
-    (res: TCallbackResponse) => {
+    socketEvents.CHECK_CALL_EXISTS,
+    callId,
+    async (res: TCallbackResponse) => {
       if (res.status === "error") {
-        navigate.push("/");
+        toastUpdate(loadingToastId, "error", res.message, false);
+        return navigate.push("/");
       }
-      console.log("res", res);
-      toastUpdate(loadingToastId, "success", "You joined", false);
-      socket.callId = callId;
+      // If call exist, Init local stream:
+      await initLocalStream();
+
+      // Join call:
+      socket.emit(
+        socketEvents.JOIN_CALL,
+        {
+          callId,
+          userSocketId: socket.id,
+        },
+        (res: TCallbackResponse) => {
+          if (res.status === "error") {
+            toastUpdate(loadingToastId, "error", res.message, false);
+            return navigate.push("/");
+          }
+          toastUpdate(loadingToastId, "success", "You joined", false);
+          socket.callId = callId;
+        }
+      );
     }
   );
 };
@@ -54,6 +76,7 @@ export const joinExistingCall = async (
 // New user joined the call:
 export const newUserJoinedCall = () => {
   socket.on(socketEvents.USER_JOINED, (data: TUserJoined) => {
+    // Create offer for the new user:
     createOffer(data);
   });
 };
@@ -75,7 +98,7 @@ export const userLeftCall = () => {
 
 // Send signalling message:
 export const sendSignallingMessage = (message: TSignallingMessage) => {
-  if (!socket) return; //🚩 !socket
+  if (!socket) return;
   socket.emit(socketEvents.SIGNAL_MSG, message);
 };
 

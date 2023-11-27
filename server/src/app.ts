@@ -1,32 +1,56 @@
 import express from "express";
 import { createServer } from "node:http";
-import { Server, Socket } from "socket.io";
-import cookieParser from "cookie-parser";
+import { Server } from "socket.io";
+import hpp from "hpp";
 import cors from "cors";
+import helmet from "helmet";
+import compression from "compression";
+import cookieParser from "cookie-parser";
+import { rateLimit } from "express-rate-limit";
 
-import { globalErrorHandler } from "./controllers/error.controller";
+import AppError from "./utils/appError";
+import { JwtPayload } from "jsonwebtoken";
+import { verifyJWT } from "./utils/jwt.utils";
 import { initiateSocket } from "./socket/socketConfig";
+import { globalErrorHandler } from "./controllers/error.controller";
 import environment from "./configs/environment.json";
 import { getUser } from "./services/user.services";
-import { verifyJWT } from "./utils/jwt.utils";
-
-import authRoutes from "./routes/auth.routes";
 
 import authRoutes from "./routes/auth.routes";
 
 import {
   ServerToClientEvents,
   ClientToServerEvents,
-} from "./types/socketInterfaces";
-import { JwtPayload } from "jsonwebtoken";
-import AppError from "./utils/appError";
+} from "./types/socket.types";
 
 // Express setup:
 const app = express();
 
-app.use(express.json());
+app.use(
+  express.json({
+    limit: "10kb",
+  })
+);
 app.use(cookieParser());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: "10kb" }));
+
+// Security setup:
+// app.enable("trust proxy");
+
+app.use(helmet());
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+
+app.use(limiter);
+
+app.use(hpp());
+
+app.use(compression());
 
 // CORS setup:
 const allowedOrigin =
@@ -46,6 +70,11 @@ app.use("/api/v1/auth", authRoutes);
 
 app.get("/", (req, res, next) => {
   res.send("<h1>This is the server for peer to peer video communication</h1>");
+});
+
+// 404 error handler:
+app.all("*", (req, res, next) => {
+  next(new AppError(404, `Can't find ${req.originalUrl} on this server!`));
 });
 
 // Socket setup:

@@ -6,8 +6,8 @@ import info from "@/assets/icons/info.svg";
 
 import Button from "@/components/Utils/Button";
 import InfoPanel from "./InfoPanel";
-import ChatPanel from "./ChatPanel";
-import ParticipantsPanel from "./ParticipantsPanel";
+import ChatPanel from "./Chat/ChatPanel";
+import ParticipantsPanel from "./Participants/ParticipantsPanel";
 
 const SideControlPanel = () => {
   const [showChat, setShowChat] = useState(false);
@@ -38,7 +38,6 @@ const SideControlPanel = () => {
 
   return (
     <div className="flex items-center mr-3">
-      {/* TODO: Display time */}
       <div className="flex flex-col gap-2 w-max">
         <Button
           buttonIcon={chat}

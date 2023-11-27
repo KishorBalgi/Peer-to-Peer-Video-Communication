@@ -15,47 +15,23 @@ type VideoContainerProps = {
 };
 
 const VideoContainer = ({ peerId }: VideoContainerProps) => {
-  const [micEnabled, setMicEnabled] = useState(false);
-  const [videoEnabled, setVideoEnabled] = useState(false);
   const stream = getPeer(peerId)?.stream;
   const peer = useSelector((state: IRootState) => {
     return state.call.remoteStreams.find((p) => p.peerId === peerId);
   });
 
-  useEffect(() => {
-    if (!stream) return;
-    // console.log(stream);
-    const updateStreamStatus = () => {
-      setMicEnabled(stream.getAudioTracks()[0]?.enabled);
-      setVideoEnabled(stream.getVideoTracks()[0]?.enabled);
-    };
-    updateStreamStatus();
-
-    // Listen for changes in the stream:
-    stream.onaddtrack = (event) => {
-      console.log(event);
-      updateStreamStatus();
-    };
-    stream.onremovetrack = updateStreamStatus;
-
-    return () => {
-      stream.onaddtrack = null;
-      stream.onremovetrack = null;
-    };
-  }, [stream]);
-
   return (
     <div className="w-full h-full flex flex-col justify-center items-center border border-opacity-20 border-white rounded-lg relative p-4">
-      {true && (
+      {/* {true && (
         <Image
           src={mic_off}
           alt="mic"
           className="w-7 h-7 bg-white rounded-full p-1 absolute top-4 right-4"
         />
-      )}
+      )} */}
       {true ? (
         <video
-          className=" bg-black rounded-lg"
+          className="h-full bg-black rounded-lg"
           autoPlay
           muted={peerId === socket.id}
           ref={(video) => {
@@ -71,7 +47,7 @@ const VideoContainer = ({ peerId }: VideoContainerProps) => {
         />
       )}
       <p className="absolute bottom-0 left-0 m-2 font-semibold">
-        {peer?.user.name}
+        {peer?.user.name || "You"}
       </p>
     </div>
   );

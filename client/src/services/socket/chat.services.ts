@@ -5,13 +5,15 @@ import { TChatMessage } from "@/types/socket";
 
 // Send In Call message:
 export const sendInCallMessage = (message: string) => {
-  if (!socket) return; //🚩 !socket
+  if (!socket) return;
+
   const data: TChatMessage = {
     from: socket.id,
     to: "*",
     room: socket.callId || "*",
     message,
   };
+
   socket.emit(socketEvents.CHAT_MSG, data);
 };
 
@@ -19,12 +21,8 @@ export const sendInCallMessage = (message: string) => {
 export const receiveInCallMessage = (
   callback: (data: TChatMessage) => void
 ) => {
-  if (!socket) return; //🚩 !socket
+  if (!socket) return;
   socket.on(socketEvents.CHAT_MSG, (data: TChatMessage) => {
-    console.log("In call message: ", data);
     callback(data);
-    // if(data.from !== socket.id){
-    //   toastMessage({type: "info", message: data.message});
-    // }
   });
 };

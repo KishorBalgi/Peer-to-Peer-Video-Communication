@@ -10,11 +10,13 @@ import {
 import { IStream } from "@/types/redux";
 import { receiveInCallMessage } from "../socket/chat.services";
 import { addMessage } from "@/redux/features/chat/chat.slice";
+import { toastMessage } from "@/components/Notifications/toasts";
 
+// Initialize local stream:
 export const initLocalStream = async () => {
+  let localStream: MediaStream = new MediaStream();
   try {
-    // const localStream = new MediaStream();
-    const localStream = await navigator.mediaDevices.getUserMedia({
+    localStream = await navigator.mediaDevices.getUserMedia({
       video: true,
       audio: true,
     });
@@ -22,9 +24,26 @@ export const initLocalStream = async () => {
     // disable video and audio tracks:
     localStream.getVideoTracks()[0].enabled = false;
     localStream.getAudioTracks()[0].enabled = false;
-
+  } catch (err) {
+    toastMessage({
+      type: "error",
+      message: "Camera and Mic Permission Required",
+    });
+  } finally {
+    // Add local stream to peerStore:
     addPeer(socket.id, { stream: localStream, connection: null });
-    store.dispatch(addLocalStream({ peerId: socket.id }));
+    // Add local stream to redux store:
+    store.dispatch(
+      addLocalStream({
+        peerId: socket.id,
+        user: {
+          id: store.getState().user.id,
+          name: store.getState().user.name,
+        },
+      })
+    );
+
+    // Mount socket events:
 
     // New user joined the call:
     newUserJoinedCall();
@@ -39,8 +58,6 @@ export const initLocalStream = async () => {
     receiveInCallMessage((data) => {
       store.dispatch(addMessage(data));
     });
-  } catch (err) {
-    console.log(err); //🚩 local stream error
   }
 };
 
@@ -49,7 +66,10 @@ export const toggleVideoAudio = async (
   streamData: IStream,
   toggle: "video" | "audio"
 ) => {
-  const stream = getPeer(streamData.peerId)?.stream;
+  const peer = getPeer(streamData.peerId);
+  const stream = peer?.stream;
+  const peerConnection = peer?.connection;
+
   if (!stream) return console.log("Stream not found");
 
   // For video:

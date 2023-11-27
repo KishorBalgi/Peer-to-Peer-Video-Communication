@@ -1,21 +1,23 @@
 import { useRouter } from "next/navigation";
 import { store } from "@/redux/store";
-import { socket } from "../socket/socket.services";
-import {
-  addRemoteStream,
-  removeLocalStream,
-  removeRemoteStream,
-} from "@/redux/features/call/call.slice";
-import webRTCConfig from "@/configs/webRTC.config.json";
-import { leaveCall, sendSignallingMessage } from "../socket/call.services";
-import { TSignallingMessage, TUserJoined } from "@/types/socket";
-import { addPeer, getPeer, removePeer } from "@/redux/features/call/peerStore";
-import { removeCallListeners } from "../socket/socket.cleanup";
+
 import {
   toastLoading,
   toastMessage,
   toastUpdate,
 } from "@/components/Notifications/toasts";
+import {
+  addRemoteStream,
+  removeLocalStream,
+  removeRemoteStream,
+} from "@/redux/features/call/call.slice";
+import { addPeer, getPeer, removePeer } from "@/redux/features/call/peerStore";
+
+import { socket } from "../socket/socket.services";
+import { leaveCall, sendSignallingMessage } from "../socket/call.services";
+import { removeCallListeners } from "../socket/socket.cleanup";
+import webRTCConfig from "@/configs/webRTC.config.json";
+import { TSignallingMessage, TUserJoined } from "@/types/socket";
 
 // STUN servers:
 const configuration = {
@@ -27,7 +29,6 @@ const createRTCPeerConnection = async (data: TUserJoined) => {
   const { userSocketId, user } = data;
   let peerConnection: RTCPeerConnection = new RTCPeerConnection(configuration);
 
-  console.log("New Peer Connection:", peerConnection);
   const localStream = getPeer(socket.id)?.stream;
 
   if (!localStream) return console.log("Local stream not found");
@@ -39,6 +40,7 @@ const createRTCPeerConnection = async (data: TUserJoined) => {
 
   let remoteStream: MediaStream = new MediaStream();
 
+  // Add peer to peerStore and redux store:
   addPeer(userSocketId, { stream: remoteStream, connection: peerConnection });
   store.dispatch(
     addRemoteStream({
@@ -49,7 +51,6 @@ const createRTCPeerConnection = async (data: TUserJoined) => {
 
   // Event listener for remote stream:
   peerConnection.ontrack = (event) => {
-    console.log("Remote stream received");
     event.streams[0].getTracks().forEach((track) => {
       remoteStream.addTrack(track);
     });
@@ -57,7 +58,7 @@ const createRTCPeerConnection = async (data: TUserJoined) => {
 
   // Event listener for ICE candidate:
   peerConnection.onicecandidate = (event) => {
-    // 🚩 Send ICE candidate to peer:
+    // Send ICE candidate to peer:
     if (event.candidate) {
       sendSignallingMessage({
         to: userSocketId,
@@ -107,8 +108,7 @@ const createAnswer = async (message: TSignallingMessage) => {
 
   const peerConnection = getPeer(message.from)?.connection;
 
-  if (!peerConnection)
-    return console.log("Create Offer: Peer connection not found");
+  if (!peerConnection) return;
 
   await peerConnection.setRemoteDescription(
     message.data as RTCSessionDescriptionInit
@@ -117,8 +117,7 @@ const createAnswer = async (message: TSignallingMessage) => {
   const answer = await peerConnection.createAnswer();
   await peerConnection.setLocalDescription(answer);
 
-  // 🚩 Send answer to peer:
-  console.log("Answer sent to peer: ", message.from);
+  // Send answer to peer:
   sendSignallingMessage({
     to: message.from,
     from: socket.id,
@@ -134,12 +133,9 @@ const createAnswer = async (message: TSignallingMessage) => {
 
 // Add answer:
 const addAnswer = async (message: TSignallingMessage) => {
-  console.log("Adding answer from peer: ", message.from);
-
   const peerConnection = getPeer(message.from)?.connection;
 
-  if (!peerConnection)
-    return console.log("Add answer: Peer connection not found");
+  if (!peerConnection) return;
 
   if (!peerConnection.currentRemoteDescription) {
     await peerConnection.setRemoteDescription(
@@ -152,15 +148,14 @@ const addAnswer = async (message: TSignallingMessage) => {
 
 // Handle ICE candidate event:
 const handleICECandidateEvent = (message: TSignallingMessage) => {
-  // console.log("Handling ICE candidate event");
   const peerConnection = getPeer(message.from)?.connection;
 
-  if (!peerConnection) return console.log("ICE: Peer connection not found");
+  if (!peerConnection) return;
 
   try {
     peerConnection.addIceCandidate(message.data as RTCIceCandidate);
   } catch (err) {
-    console.log(err); //🚩 ICE candidate error
+    console.log(err);
   }
 };
 
@@ -191,18 +186,21 @@ export const leaveCallHandler = (navigate: ReturnType<typeof useRouter>) => {
   // Close all peer connections and remove remote streams:
   peerIds.forEach((peerId) => {
     const peerConnection = getPeer(peerId)?.connection;
-    if (!peerConnection) return console.log("Leave call: Peer not found");
-    peerConnection.close();
-    removePeer(peerId);
+    if (peerConnection) {
+      peerConnection.close();
+      removePeer(peerId);
+    }
+    // Remove remote stream:
     store.dispatch(removeRemoteStream(peerId));
   });
 
   // Close local stream:
   const localStream = getPeer(socket.id)?.stream;
-  if (!localStream) return console.log("Local stream not found");
-  localStream.getTracks().forEach((track) => track.stop());
-  removePeer(socket.id);
-  store.dispatch(removeLocalStream());
+  if (localStream) {
+    localStream.getTracks().forEach((track) => track.stop());
+    removePeer(socket.id);
+    store.dispatch(removeLocalStream());
+  }
   // Send user left socket event:
   leaveCall();
 
@@ -221,9 +219,32 @@ export const userLeftCallHandler = (peerId: string) => {
   const peer = store
     .getState()
     .call.remoteStreams.find((p) => p.peerId === peerId);
-  if (!peerConnection) return console.log("User left call: Peer not found");
+  if (!peerConnection) return;
+
   peerConnection.close();
-  toastMessage({ type: "info", message: `${peer?.user.name} left` });
   removePeer(peerId);
   store.dispatch(removeRemoteStream(peerId));
+
+  toastMessage({ type: "info", message: `${peer?.user.name} left` });
+};
+
+// Update tracks:
+export const updateTracks = (stream: MediaStream) => {
+  const peers = store.getState().call.remoteStreams;
+
+  peers.forEach((peer) => {
+    const peerConnection = getPeer(peer.peerId)?.connection;
+
+    if (!peerConnection) return;
+
+    // Replace tracks:
+    peerConnection.getSenders().forEach((sender) => {
+      if (sender.track?.kind === "audio") {
+        sender.replaceTrack(stream.getAudioTracks()[0]);
+      }
+      if (sender.track?.kind === "video") {
+        sender.replaceTrack(stream.getVideoTracks()[0]);
+      }
+    });
+  });
 };
