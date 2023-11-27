@@ -1,8 +1,4 @@
 <!-- PROJECT LOGO -->
-
-<a href="#readme-top"></a>
-<br />
-
 <div align="center">
   <a href="https://p-to-p-video-client.onrender.com/">
     <img src="https://github.com/KishorBalgi/Peer-to-Peer-Video-Communication/assets/75678927/4867b00c-4dc6-4a52-ae05-6d994a875528" alt="Logo" width="200" height="200">
@@ -21,6 +17,7 @@
 </div>
 
 <!-- TABLE OF CONTENTS -->
+<a name="readme-top"></a>
 <details>
   <summary>Table of Contents</summary>
   <ol>
