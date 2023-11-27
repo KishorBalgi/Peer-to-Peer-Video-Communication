@@ -46,7 +46,7 @@ const CallPage = ({ params }: { params: { id: string } }) => {
 
   return (
     <>
-      {!localStream || (user && user.id == "") ? (
+      {user && user.id == "" ? (
         <Loading />
       ) : (
         <>
